@@ -1,0 +1,13 @@
+---
+- name: destroy
+
+  hosts: localhost
+
+  vars:
+
+    kind_state: absent
+
+  roles:
+
+    - nephelaiio.plugins
+    - nephelaiio.kind

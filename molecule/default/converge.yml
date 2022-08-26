@@ -1,0 +1,9 @@
+---
+- name: converge
+
+  hosts: localhost
+
+  roles:
+
+    - nephelaiio.plugins
+    - nephelaiio.kind

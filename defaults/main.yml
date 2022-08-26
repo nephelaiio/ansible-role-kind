@@ -1,0 +1,6 @@
+---
+kind_state: 'present'
+kind_release_tag: "{{ lookup('ansible.builtin.env', 'KIND_RELEASE', default='latest') }}"
+kind_image_tag: "{{ lookup('ansible.builtin.env', 'KIND_IMAGE', default='latest') }}"
+kind_cluster_name: 'kind'
+kind_kubeconfig: '~/.kube/config'

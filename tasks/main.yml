@@ -1,0 +1,83 @@
+---
+- name: check desired cluster status
+  ansible.builtin.fail:
+    msg: "kind_state must be one of [{{ kind_valid_states | map('map_format', \"'%s'\") | join(', ') }}]"
+  vars:
+    kind_valid_states:
+      - present
+      - absent
+  when: kind_state not in kind_valid_states
+
+- name: create tempdir
+  ansible.builtin.tempfile:
+    state: directory
+    prefix: kind
+  register: kind_tmpdir
+  changed_when: false
+
+- name: set kind deployment target
+  ansible.builtin.set_fact:
+    _kind_bin: "{{ kind_tmpdir.path }}/kind"
+
+- block:
+
+    - name: set kind release to latest tag
+      block:
+
+        - name: query kind releases
+          ansible.builtin.uri:
+            url: "https://api.github.com/repos/kubernetes-sigs/kind/releases/{{ kind_release_tag }}"
+          register: kind_release_query
+
+        - name: set kind release target
+          ansible.builtin.set_fact:
+            kind_release_tag: "{{ kind_release_query.json.tag_name }}"
+
+      when: kind_release_tag == 'latest'
+
+    - name: set kind release to requested tag
+      ansible.builtin.set_fact:
+        kind_release: "{{ kind_release_tag }}"
+
+    - name: print debugging information
+      ansible.builtin.debug:
+        msg: "Using kind release '{{ kind_release_tag }}', image 'kindest/node:{{ kind_image_tag }}'"
+
+    - name: download kind executable
+      ansible.builtin.get_url:
+        url: "https://kind.sigs.k8s.io/dl/{{ kind_release }}/kind-linux-amd64"
+        dest: "{{ _kind_bin }}"
+        mode: 0777
+      changed_when: false
+
+    - name: list kind clusters
+      ansible.builtin.command: >-
+        {{ _kind_bin }} get clusters -q
+      register: kind_cluster_query
+      changed_when: false
+
+    - name: deploy kind cluster
+      ansible.builtin.shell: >-
+        {{ _kind_bin }} create cluster {{ args_name }} {{ args_kubeconfig }} {{ args_image }}
+      vars:
+        args_name: "--name {{ kind_cluster_name }}"
+        args_kubeconfig: "--kubeconfig {{ kind_kubeconfig }}"
+        args_image: "--image kindest/node:{{ kind_image_tag }}"
+      when:
+        - kind_state != 'absent'
+        - kind_cluster_name not in kind_cluster_query.stdout_lines
+
+    - name: destroy kind cluster
+      ansible.builtin.shell: >-
+        {{ _kind_bin }} delete cluster --name {{ kind_cluster_name }}
+      when:
+        - kind_state == 'absent'
+        - kind_cluster_name in kind_cluster_query.stdout_lines
+
+  always:
+
+    - name: destroy tempdir
+      ansible.builtin.file:
+        state: absent
+        path: "{{ kind_tmpdir.path }}"
+      changed_when: false

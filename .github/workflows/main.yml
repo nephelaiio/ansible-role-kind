@@ -1,0 +1,81 @@
+---
+name: Molecule
+
+on:
+
+  pull_request:
+  push:
+    branches:
+      - master
+  schedule:
+    - cron: "0 5 * * 5"
+
+defaults:
+
+  run:
+    working-directory: 'nephelaiio.kind'
+
+jobs:
+
+  lint:
+
+    name: lint
+    runs-on: ubuntu-latest
+    steps:
+
+      - name: check out the codebase
+        uses: actions/checkout@v2
+        with:
+          path: 'nephelaiio.kind'
+
+      - name: set up python 3
+        uses: actions/setup-python@v2
+        with:
+          python-version: '3.x'
+
+      - name: install poetry
+        run: pip3 install poetry
+
+      - name: install pips
+        run: poetry install
+
+      - name: lint code
+        run: |
+          set -e
+          poetry run yamllint .
+          poetry run ansible-lint .
+
+  molecule:
+
+    name: molecule
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        image:
+          - latest
+          - v1.24.0
+          - v1.23.6
+          - v1.22.9
+    steps:
+      - name: check out the codebase.
+        uses: actions/checkout@v2
+        with:
+          path: 'nephelaiio.kind'
+
+      - name: set up python 3
+        uses: actions/setup-python@v2
+        with:
+          python-version: '3.x'
+
+      - name: install poetry
+        run: pip3 install poetry
+
+      - name: install pips
+        run: poetry install
+
+      - name: run molecule tests.
+        run: poetry run molecule test
+        env:
+          PY_COLORS: '1'
+          ANSIBLE_FORCE_COLOR: '1'
+          KIND_IMAGE: ${{ matrix.image }}

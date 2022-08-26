@@ -1,0 +1,47 @@
+---
+- name: verify
+
+  hosts: localhost
+
+  tasks:
+
+    - name: set kind deployment target
+      ansible.builtin.set_fact:
+        _kind_bin: "{{ _tmpdir }}/kind"
+
+    - name: query kind releases
+      ansible.builtin.uri:
+        url: "https://api.github.com/repos/kubernetes-sigs/kind/releases/latest"
+      register: kind_release_query
+
+    - name: set kind release target
+      ansible.builtin.set_fact:
+        kind_release: "{{ kind_release_query.json.tag_name }}"
+
+    - name: download kind executable
+      ansible.builtin.get_url:
+        url: "https://kind.sigs.k8s.io/dl/{{ kind_release }}/kind-linux-amd64"
+        dest: "{{ _kind_bin }}"
+        mode: 0777
+      changed_when: false
+
+    - name: list kind clusters
+      ansible.builtin.command: >-
+        {{ _kind_bin }} get clusters -q
+      register: kind_cluster_query
+      changed_when: false
+
+    - name: check kind cluster state
+      ansible.builtin.fail:
+        msg: "kind cluster {{ kind_cluster_name }} not found"
+      when: kind_cluster_name not in kind_cluster_query.stdout_lines
+
+    - name: list cluster nodes
+      ansible.builtin.shell: >-
+        KUBECONFIG={{ kind_kubeconfig }} kubectl get nodes
+      register: kind_node_query
+
+    - name: check kind cluster nodes
+      fail:
+        msg: "kubectl call to cluster failed"
+      when: kind_node_query is failed or kind_node_query.stdout_lines | length == 0
