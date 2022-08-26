@@ -1,7 +1,7 @@
 # nephelaiio.kind
 
 [![Build Status](https://github.com/nephelaiio/ansible-role-kind/workflows/Molecule/badge.svg)](https://github.com/nephelaiio/ansible-role-kind/actions)
-[![Ansible Galaxy](http://img.shields.io/badge/ansible--galaxy-nephelaiio.kind.vim-blue.svg)](https://galaxy.ansible.com/nephelaiio/kind/)
+[![Ansible Galaxy](http://img.shields.io/badge/ansible--galaxy-nephelaiio.kind-blue.svg)](https://galaxy.ansible.com/nephelaiio/kind/)
 
 An [ansible role](https://galaxy.ansible.com/nephelaiio/kind) to install and destroy [Kind](https://github.com/kubernetes-sigs/kind) clusters
 
