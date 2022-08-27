@@ -7,7 +7,15 @@ An [ansible role](https://galaxy.ansible.com/nephelaiio/kind) to install and des
 
 ## Role Variables
 
-Please refer to the [defaults file](/defaults/main.yml) for an up to date list of input parameters.
+With default values role will instanciate a 4 node cluster using latest kind release and image
+
+| Parameter Name     |    Default Value | Description                                                                         |
+|:-------------------|-----------------:|:------------------------------------------------------------------------------------|
+| kind_release_tag   |         'latest' | Kind binary releaese as taken from https://github.com/kubernetes-sigs/kind/releases |
+| kind_image_tag     |         'latest' | Kind image releaese as taken from https://hub.docker.com/r/kindest/node/tags        |
+| kind_cluster_state |        'present' | Whether to create ('present') or destroy ('absent') the target cluster              |
+| kind_cluster_name  |           'kind' | Name of the cluster to create/destroy                                               |
+| kind_kubeconfig    | '~/.kube/config' | Path to store kubeconfig file for the cluster                                       |
 
 ## Dependencies
 
