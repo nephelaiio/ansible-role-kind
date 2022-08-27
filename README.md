@@ -9,14 +9,14 @@ An [ansible role](https://galaxy.ansible.com/nephelaiio/kind) to install and des
 
 With default values role will instanciate a 4 node cluster using latest kind release and image
 
-| Parameter Name     |  Default Value | Description                                                                      |
-|:-------------------|---------------:|:---------------------------------------------------------------------------------|
-| kind_release_tag   |         latest | Taken from Kind [release page](https://github.com/kubernetes-sigs/kind/releases) |
-| kind_image_tag     |         latest | Taken from [docker hub](https://hub.docker.com/r/kindest/node/tags)              |
-| kind_cluster_state |        present | Whether to create ('present') or destroy ('absent') the target cluster           |
-| kind_cluster_name  |           kind | Name of the cluster to create/destroy                                            |
-| kind_kubeconfig    | ~/.kube/config | Path to store kubeconfig file for the cluster                                    |
-| kind_network       |           kind | Docker network where to provision the cluster                                    |
+| Parameter Name     |  Default Value | Description                                                                        |
+|:-------------------|---------------:|:-----------------------------------------------------------------------------------|
+| kind_release_tag   |         latest | Taken from Kind's [release page](https://github.com/kubernetes-sigs/kind/releases) |
+| kind_image_tag     |         latest | Taken from [docker hub](https://hub.docker.com/r/kindest/node/tags)                |
+| kind_cluster_state |        present | Whether to create ('present') or destroy ('absent') the target cluster             |
+| kind_cluster_name  |           kind | Name of the cluster to create/destroy                                              |
+| kind_kubeconfig    | ~/.kube/config | Path to store kubeconfig file for the cluster                                      |
+| kind_network       |           kind | Docker network where to provision the cluster                                      |
 
 ## Dependencies
 
