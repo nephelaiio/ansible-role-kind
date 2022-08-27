@@ -1,12 +1,12 @@
 ---
 - name: check desired cluster status
   ansible.builtin.fail:
-    msg: "kind_state must be one of [{{ kind_valid_states | map('map_format', \"'%s'\") | join(', ') }}]"
+    msg: "kind_cluster_state must be one of [{{ kind_valid_states | map('map_format', \"'%s'\") | join(', ') }}]"
   vars:
     kind_valid_states:
       - present
       - absent
-  when: kind_state not in kind_valid_states
+  when: kind_cluster_state not in kind_valid_states
 
 - name: create tempdir
   ansible.builtin.tempfile:
@@ -65,14 +65,14 @@
         args_image: "--image kindest/node:{{ kind_image_tag }}"
         args_image_option: "{{ args_image if kind_image_tag != 'latest' else '' }}"
       when:
-        - kind_state != 'absent'
+        - kind_cluster_state != 'absent'
         - kind_cluster_name not in kind_cluster_query.stdout_lines
 
     - name: destroy kind cluster
       ansible.builtin.shell: >-
         {{ _kind_bin }} delete cluster --name {{ kind_cluster_name }}
       when:
-        - kind_state == 'absent'
+        - kind_cluster_state == 'absent'
         - kind_cluster_name in kind_cluster_query.stdout_lines
 
   always:

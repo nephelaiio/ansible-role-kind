@@ -5,7 +5,7 @@
 
   vars:
 
-    kind_state: absent
+    kind_cluster_state: absent
 
   roles:
 
