@@ -76,15 +76,15 @@
 
     - name: deploy kind cluster
       ansible.builtin.shell: >-
-        {{ _kind_bin }} create cluster {{ args_name }} {{ args_kubeconfig }} {{ args_image_option }} {{ args_config }} {{ args_net }}
+        {{ _kind_bin }} create cluster {{ args_name }} {{ args_kubeconfig }} {{ args_image_option }} {{ args_config }} {{ args_net_option }}
       vars:
         args_name: "--name {{ kind_cluster_name }}"
         args_kubeconfig: "--kubeconfig {{ kind_kubeconfig }}"
         args_image: "--image kindest/node:{{ kind_image_tag }}"
         args_image_option: "{{ args_image if kind_image_tag != 'latest' else '' }}"
         args_config: "--config {{ kind_config_path }}"
-        args_network: "--net {{ kind_network }}"
-        args_network_option: "{{ args_network if kind_network != 'kind' else '' }}"
+        args_net: "--net {{ kind_network }}"
+        args_net_option: "{{ args_network if kind_network != 'kind' else '' }}"
       when:
         - kind_cluster_state != 'absent'
         - kind_cluster_name not in kind_cluster_query.stdout_lines
