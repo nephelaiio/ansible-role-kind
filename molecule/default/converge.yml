@@ -3,6 +3,8 @@
 
   hosts: localhost
 
+  gather_facts: false
+
   roles:
 
     - nephelaiio.plugins

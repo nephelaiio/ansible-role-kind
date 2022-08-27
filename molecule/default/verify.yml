@@ -3,7 +3,13 @@
 
   hosts: localhost
 
+  gather_facts: false
+
   tasks:
+
+    - name: print kubeconfig debug info
+      debug:
+        msg: "using kubeconfig at {{ kind_kubeconfig }}"
 
     - name: set kind deployment target
       ansible.builtin.set_fact:
@@ -38,10 +44,17 @@
 
     - name: list cluster nodes
       ansible.builtin.shell: >-
-        KUBECONFIG={{ kind_kubeconfig }} kubectl get nodes
+        KUBECONFIG={{ kind_kubeconfig }} kubectl get nodes --no-headers
       register: kind_node_query
 
-    - name: check kind cluster nodes
-      fail:
+    - name: check kubectl command
+      ansible.builtin.fail:
         msg: "kubectl call to cluster failed"
-      when: kind_node_query is failed or kind_node_query.stdout_lines | length == 0
+      when: kind_node_query is failed
+
+    - name: check kind cluster nodes
+      ansible.builtin.fail:
+        msg: "expected 4 cluster nodes, got {{ kind_node_num }}"
+      vars:
+        kind_node_num: "{{ kind_node_query.stdout_lines | length }}"
+      when: kind_node_num | int != 4

@@ -3,6 +3,8 @@
 
   hosts: localhost
 
+  gather_facts: false
+
   vars:
 
     kind_cluster_state: absent

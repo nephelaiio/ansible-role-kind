@@ -18,6 +18,6 @@ provisioner:
           ansible_python_interpreter: python
           _tmpdir: ${MOLECULE_EPHEMERAL_DIRECTORY}
           kind_kubeconfig: ${MOLECULE_EPHEMERAL_DIRECTORY}/kubeconfig
-          kind_cluster_name: molecule
+          kind_cluster_name: molecule-kind
 verifier:
   name: ansible
