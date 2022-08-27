@@ -72,6 +72,7 @@
       ansible.builtin.copy:
         dest: "{{ kind_config_path }}"
         content: "{{ kind_config_content | to_nice_yaml(indent=2) }}"
+      changed_when: false
 
     - name: deploy kind cluster
       ansible.builtin.shell: >-
