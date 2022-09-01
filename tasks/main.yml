@@ -47,8 +47,15 @@
       ansible.builtin.get_url:
         url: "https://kind.sigs.k8s.io/dl/{{ kind_release }}/kind-linux-amd64"
         dest: "{{ _kind_bin }}"
-        mode: 0777
+        mode: 0755
       changed_when: false
+
+    - name: copy kind executable to requested location
+      ansible.builtin.copy:
+        src: "{{ _kind_bin }}"
+        dest: "{{ kind_bin }}"
+        mode: 0755
+      when: kind_bin is defined
 
     - name: list kind clusters
       ansible.builtin.command: >-
