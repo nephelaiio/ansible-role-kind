@@ -50,16 +50,19 @@
         mode: 0755
       changed_when: false
 
-    - name: copy kind executable to requested location
-      ansible.builtin.copy:
-        src: "{{ _kind_bin }}"
-        dest: "{{ kind_bin }}"
-        mode: 0755
-      when: kind_bin is defined
+    - block:
 
-    - name: debug kind bin release
-      ansible.builtin.debug:
-        msg: "Using kind binary release '{{ kind_release_tag }}' at path '{{ kind_bin }}'"
+        - name: copy kind executable to requested location
+          ansible.builtin.copy:
+            src: "{{ _kind_bin }}"
+            dest: "{{ kind_bin }}"
+            mode: 0755
+
+        - name: debug kind bin release
+          ansible.builtin.debug:
+            msg: "Using kind binary release '{{ kind_release_tag }}' at path '{{ kind_bin }}'"
+
+      when: kind_bin is defined
 
     - name: list kind clusters
       ansible.builtin.command: >-
