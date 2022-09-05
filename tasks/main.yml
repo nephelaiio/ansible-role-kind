@@ -33,13 +33,13 @@
           ansible.builtin.set_fact:
             kind_release_tag: "{{ kind_release_query.json.tag_name }}"
 
-      when: kind_release_tag == 'latest'
+      when: kind_release_tag == 'latest' or kind_release_tag | length == 0
 
     - name: set kind release to requested tag
       ansible.builtin.set_fact:
         kind_release: "{{ kind_release_tag }}"
 
-    - name: print debugging information
+    - name: debug kind image release
       ansible.builtin.debug:
         msg: "Using kind release '{{ kind_release_tag }}', image 'kindest/node:{{ kind_image_tag }}'"
 
@@ -56,6 +56,10 @@
         dest: "{{ kind_bin }}"
         mode: 0755
       when: kind_bin is defined
+
+    - name: debug kind bin release
+      ansible.builtin.debug:
+        msg: "Using kind binary release '{{ kind_release_tag }}' at path '{{ kind_bin }}'"
 
     - name: list kind clusters
       ansible.builtin.command: >-
