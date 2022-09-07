@@ -51,11 +51,13 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
+        release:
+          - v0.15.0
         image:
-          - latest
-          - v1.24.0
-          - v1.23.6
-          - v1.22.9
+          - v1.25.0
+          - v1.24.4
+          - v1.23.10
+          - v1.22.13
     steps:
       - name: check out the codebase.
         uses: actions/checkout@v2
@@ -78,4 +80,5 @@ jobs:
         env:
           PY_COLORS: '1'
           ANSIBLE_FORCE_COLOR: '1'
+          KIND_RELEASE: ${{ matrix.release }}
           KIND_IMAGE: ${{ matrix.image }}
