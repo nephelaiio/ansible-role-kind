@@ -83,7 +83,7 @@ jobs:
         run: poetry install
 
       - name: run molecule tests.
-        run: poetry run molecule test
+        run: poetry run molecule test -s ${{ matrix.scenario }}
         env:
           PY_COLORS: '1'
           ANSIBLE_FORCE_COLOR: '1'
