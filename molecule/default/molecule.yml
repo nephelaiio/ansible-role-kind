@@ -21,7 +21,7 @@ provisioner:
           ansible_connection: local
           ansible_python_interpreter: python
           _tmpdir: ${MOLECULE_EPHEMERAL_DIRECTORY}
-          kind_kubeconfig: ${MOLECULE_EPHEMERAL_DIRECTORY}/kubeconfig
+          kind_kubeconfig: ${MOLECULE_EPHEMERAL_DIRECTORY}/config
           kind_cluster_name: molecule-kind
           kind_multinode: true
 verifier:
