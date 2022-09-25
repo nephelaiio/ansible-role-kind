@@ -23,6 +23,6 @@ provisioner:
           _tmpdir: ${MOLECULE_EPHEMERAL_DIRECTORY}
           kind_kubeconfig: ${MOLECULE_EPHEMERAL_DIRECTORY}/kubeconfig
           kind_cluster_name: molecule-kind
-          kind_multinode: true
+          kind_multinode: false
 verifier:
   name: ansible
