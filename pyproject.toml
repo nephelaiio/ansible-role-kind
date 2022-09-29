@@ -7,16 +7,16 @@ authors = ["nephelaiio"]
 [tool.poetry.dependencies]
 python = "^3.8"
 
-[tool.poetry.dev-dependencies]
+[tool.poetry.group.dev.dependencies]
 tox = "^3.25.0"
-ansible-lint = "~5"
+docker = "^6.0.0"
+molecule = "^3.6.1"
+docker-compose = "^1.29.2"
 yamllint = "^1.27.1"
+ansible-lint = "~5"
 ansible = "^6.1.0"
 MarkupSafe = "2.0.1"
 pytest = "^7.1.2"
-cookiecutter = "^2.1.1"
-molecule-docker = "^2.0.0"
-molecule = "^4.0.1"
 netaddr = "^0.8.0"
 
 [build-system]
