@@ -170,7 +170,7 @@
             - role: worker
             - role: worker
           {% endif -%}
-          {%- if (kind_registry_deploy | bool or kind_proxy_deploy | deploy) -%}
+          {%- if ((kind_registry_deploy | bool) or (kind_proxy_deploy | bool)) -%}
           containerdConfigPatches:
           - |-
           {% endif -%}

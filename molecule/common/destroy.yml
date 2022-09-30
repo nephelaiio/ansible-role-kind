@@ -23,17 +23,35 @@
         name: "{{ kind_registry_container }}"
       register: registry_container
 
-    - name: verify registry container status
+    - name: verify registry container cleanup
+      fail:
+        msg: "container {{ kind_registry_container }} was terminated"
+      when:
+        - not kind_registry_cleanup | bool
+        - not (registry_container.exists | bool)
+
+    - name: verify registry container cleanup
       fail:
         msg: "container {{ kind_registry_container }} was not cleaned up properly"
-      when: registry_container.exists
+      when:
+        - kind_registry_cleanup | bool
+        - registry_container.exists | bool
 
     - name: query registry proxy container info
       community.docker.docker_container_info:
         name: "{{ kind_proxy_container }}"
       register: proxy_container
 
+    - name: verify registry container cleanup
+      fail:
+        msg: "container {{ kind_proxy_container }} was terminated"
+      when:
+        - not kind_proxy_cleanup | bool
+        - not (proxy_container.exists | bool)
+
     - name: verify proxy container status
       fail:
         msg: "container {{ kind_proxy_container }} was not cleaned up properly"
-      when: proxy_container.exists
+      when:
+        - kind_proxy_cleanup | bool
+        - proxy_container.exists | bool

@@ -7,13 +7,12 @@ kind_kubeconfig: '~/.kube/config'
 kind_multinode: true
 kind_network_name: kind
 kind_network_addr: 172.60.0.0/16
-kind_registry_deploy: false
+kind_registry_deploy: true
 kind_registry_container: "{{ kind_cluster_name }}-registry"
 kind_registry_hostname: "{{ kind_registry_container }}"
 kind_registry_port: 5000
 kind_registry_cleanup: true
-kind_proxy_deploy: false
+kind_proxy_deploy: true
 kind_proxy_container: "{{ kind_cluster_name }}-proxy"
 kind_proxy_hostname: "localhost"
-kind_proxy_recreate: false
 kind_proxy_cleanup: true
