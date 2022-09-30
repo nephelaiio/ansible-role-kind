@@ -1,0 +1,30 @@
+---
+dependency:
+  name: galaxy
+  options:
+    role-file: requirements.yml
+    requirements-file: requirements.yml
+platforms:
+  - name: localhost
+driver:
+  name: delegated
+provisioner:
+  name: ansible
+  playbooks:
+    converge: ../common/converge.yml
+    verify: ../common/verify.yml
+    destroy: ../common/destroy.yml
+  inventory:
+    hosts:
+      all:
+        vars:
+          ansible_connection: local
+          ansible_python_interpreter: python
+          _tmpdir: ${MOLECULE_EPHEMERAL_DIRECTORY}
+          kind_kubeconfig: ${MOLECULE_EPHEMERAL_DIRECTORY}/config
+          kind_cluster_name: molecule-kind
+          kind_multinode: true
+          kind_registry_deploy: true
+          kind_proxy_deploy: true
+verifier:
+  name: ansible

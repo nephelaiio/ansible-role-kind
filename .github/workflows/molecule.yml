@@ -54,6 +54,7 @@ jobs:
         scenario:
           - default
           - singlenode
+          - registry
         include:
           - release: v0.16.0
             image: v1.25.2
