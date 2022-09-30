@@ -25,9 +25,7 @@ provisioner:
           kind_cluster_name: molecule-kind
           kind_nodes: 2
           kind_proxy_deploy: true
-          kind_proxy_cleanup: false
           kind_registry_deploy: true
-          kind_registry_cleanup: false
           kind_registry_port: 5001
 verifier:
   name: ansible
