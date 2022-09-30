@@ -66,6 +66,7 @@
             dest: "{{ _kind_bin }}"
             mode: 0755
           when: not (kind_bin_file.stat.exists | bool)
+          changed_when: false
 
       rescue:
 
