@@ -163,15 +163,18 @@
         kind_config_path: "{{ kind_tmpdir.path }}/config.yaml"
         kind_config_content: |
           kind: Cluster
+
           apiVersion: kind.x-k8s.io/v1alpha4
-          {% if (kind_multinode | bool) -%}
+
+          {% if (kind_nodes > 1) -%}
           nodes:
             - role: control-plane
+            {% for i in range(1, kind_nodes) -%}
             - role: worker
-            - role: worker
-            - role: worker
-          {% endif -%}
-          {%- if ((kind_registry_deploy | bool) or (kind_proxy_deploy | bool)) -%}
+            {% endfor -%}
+          {%- endif -%}
+          {%- if ((kind_registry_deploy | bool) or (kind_proxy_deploy | bool)) %}
+
           containerdConfigPatches:
           - |-
           {% endif -%}

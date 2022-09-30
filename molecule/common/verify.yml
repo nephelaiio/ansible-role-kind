@@ -56,6 +56,6 @@
       ansible.builtin.fail:
         msg: "expected {{ kind_target_nodes }} cluster nodes, got {{ kind_node_num }}"
       vars:
-        kind_target_nodes: "{{ 4 if (kind_multinode | bool) else 1 }}"
+        kind_target_nodes: "{{ kind_nodes }}"
         kind_node_num: "{{ kind_node_query.stdout_lines | length }}"
       when: kind_node_num | int != kind_target_nodes | int

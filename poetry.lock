@@ -1,4 +1,4 @@
-[[package]]
+    [[package]]
 name = "ansible"
 version = "6.3.0"
 description = "Radically simple IT automation"
