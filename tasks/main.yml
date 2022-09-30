@@ -106,7 +106,7 @@
 
     - name: deploy docker private registry
       community.docker.docker_container:
-        state: present
+        state: started
         name: '{{ kind_registry_hostname }}'
         image: registry:2
         container_default_behavior: no_defaults
@@ -120,7 +120,7 @@
 
     - name: deploy docker registry proxy
       community.docker.docker_container:
-        state: present
+        state: started
         name: '{{ kind_proxy_hostname }}'
         image: registry:2
         container_default_behavior: no_defaults
