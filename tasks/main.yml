@@ -8,6 +8,16 @@
       - absent
   when: kind_cluster_state not in kind_valid_states
 
+- name: check cluster network format
+  ansible.builtin.fail:
+    msg: "kind_network_addr must be in network/prefix format"
+  when: not (kind_network_addr | ansible.utils.ipaddr('network/prefix'))
+
+- name: check cluster network prefix length
+  ansible.builtin.fail:
+    msg: "kind_network_addr prefix must be /24 or larger"
+  when: kind_network_addr | ansible.utils.ipaddr('prefix') | int > 24
+
 - name: create tempdir
   ansible.builtin.tempfile:
     state: directory
@@ -43,12 +53,30 @@
       ansible.builtin.debug:
         msg: "Using kind release '{{ kind_release_tag }}', image 'kindest/node:{{ kind_image_tag }}'"
 
-    - name: download kind executable
-      ansible.builtin.get_url:
-        url: "https://kind.sigs.k8s.io/dl/{{ kind_release }}/kind-linux-amd64"
-        dest: "{{ _kind_bin }}"
-        mode: 0755
-      changed_when: false
+    - name: stat kind executable
+      ansible.builtin.stat:
+        path: "{{ _kind_bin }}"
+      register: kind_bin_file
+
+    - block:
+
+        - name: download kind executable
+          ansible.builtin.get_url:
+            url: "https://kind.sigs.k8s.io/dl/{{ kind_release }}/kind-linux-amd64"
+            dest: "{{ _kind_bin }}"
+            mode: 0755
+          when: not (kind_bin_file.stat.exists | bool)
+
+      rescue:
+
+        - name: check local kind binary
+          ansible.builtin.shell: which kind
+          register: kind_bin_query
+          changed_when: false
+
+        - name: override local kind binary
+          ansible.builtin.set_fact:
+            _kind_bin: "{{ kind_bin_query.stdout }}"
 
     - block:
 
@@ -63,6 +91,45 @@
             msg: "Using kind binary release '{{ kind_release_tag }}' at path '{{ kind_bin }}'"
 
       when: kind_bin is defined
+
+    - name: create docker kind network
+      community.docker.docker_network:
+        name: "{{ kind_network_name }}"
+        ipam_config:
+          - subnet: "{{ _supernet }}"
+            gateway: "{{ _subnet | ipaddr(1) | ipaddr('address') }}"
+            iprange: "{{ _subnet }}"
+      vars:
+        _supernet: "{{ kind_network_addr }}"
+        _subnet: "{{ _supernet | ansible.utils.ipsubnet(24, 1) }}"
+      when: kind_cluster_state != 'absent'
+
+    - name: deploy docker private registry
+      community.docker.docker_container:
+        state: present
+        name: '{{ kind_registry_hostname }}'
+        image: registry:2
+        container_default_behavior: no_defaults
+        published_ports: "{{ kind_registry_port }}"
+        restart_policy: unless-stopped
+        network_mode: "{{ kind_network_name }}"
+        networks:
+          - name: "{{ kind_network_name }}"
+            aliases:
+              - "{{ kind_registry_hostname }}"
+
+    - name: deploy docker registry proxy
+      community.docker.docker_container:
+        state: present
+        name: '{{ kind_proxy_hostname }}'
+        image: registry:2
+        container_default_behavior: no_defaults
+        restart_policy: unless-stopped
+        network_mode: "{{ kind_network_name }}"
+        networks:
+          - name: "{{ kind_network_name }}"
+            aliases:
+              - "{{ kind_proxy_hostname }}"
 
     - name: list kind clusters
       ansible.builtin.command: >-

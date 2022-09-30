@@ -5,5 +5,10 @@ kind_cluster_state: 'present'
 kind_cluster_name: 'kind'
 kind_kubeconfig: '~/.kube/config'
 kind_multinode: true
-kind_registry_hostname: ''
-kind_proxy_hostname: ''
+kind_network_name: kind
+kind_network_addr: 172.60.0.0/16
+kind_registry_hostname: "{{ kind_cluster_name }}-registry"
+kind_registry_port: 5000
+kind_registry_recreate: false
+kind_proxy_hostname: "{{ kind_cluster_name }}-proxy"
+kind_proxy_recreate: false

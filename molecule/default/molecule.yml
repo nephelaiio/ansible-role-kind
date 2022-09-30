@@ -14,8 +14,6 @@ provisioner:
     converge: ../common/converge.yml
     verify: ../common/verify.yml
     destroy: ../common/destroy.yml
-    prepare: ../common/prepare.yml
-    cleanup: ../common/cleanup.yml
   inventory:
     hosts:
       all:
@@ -26,7 +24,5 @@ provisioner:
           kind_kubeconfig: ${MOLECULE_EPHEMERAL_DIRECTORY}/config
           kind_cluster_name: molecule-kind
           kind_multinode: true
-          kind_registry_hostname: kind-registry
-          kind_proxy_hostname: kind-proxy
 verifier:
   name: ansible
