@@ -112,7 +112,8 @@
             name: '{{ kind_registry_container }}'
             image: registry:2
             container_default_behavior: no_defaults
-            published_ports: "{{ kind_registry_port }}"
+            published_ports:
+              - "{{ kind_registry_port }}:{{ kind_registry_port }}"
             restart_policy: unless-stopped
             network_mode: "{{ kind_network_name }}"
             networks:
