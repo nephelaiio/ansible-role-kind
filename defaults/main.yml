@@ -6,7 +6,7 @@ kind_cluster_name: 'kind'
 kind_kubeconfig: '~/.kube/config'
 kind_multinode: true
 kind_network_name: kind
-kind_network_addr: 172.60.0.0/16
+kind_network_addr: 172.19.0.0/16
 kind_registry_deploy: true
 kind_registry_container: "{{ kind_cluster_name }}-registry"
 kind_registry_hostname: "{{ kind_registry_container }}"
