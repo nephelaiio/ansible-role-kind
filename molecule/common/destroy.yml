@@ -8,8 +8,36 @@
   vars:
 
     kind_cluster_state: absent
+    kind_registry_container: "{{ kind_cluster_name }}-registry"
+    kind_proxy_container: "{{ kind_cluster_name }}-proxy"
 
   roles:
 
     - nephelaiio.plugins
     - nephelaiio.kind
+
+  tasks:
+
+    - name: query local registry container info
+      community.docker.docker_container_info:
+        name: "{{ kind_registry_container }}"
+      register: registry_container
+
+    - name: verify registry container cleanup
+      fail:
+        msg: "container {{ kind_registry_container }} was not cleaned up properly"
+      when:
+        - kind_registry_cleanup | bool
+        - registry_container.exists | bool
+
+    - name: query registry proxy container info
+      community.docker.docker_container_info:
+        name: "{{ kind_proxy_container }}"
+      register: proxy_container
+
+    - name: verify proxy container status
+      fail:
+        msg: "container {{ kind_proxy_container }} was not cleaned up properly"
+      when:
+        - kind_proxy_cleanup | bool
+        - proxy_container.exists | bool
