@@ -111,10 +111,9 @@
             state: started
             name: '{{ kind_registry_container }}'
             image: registry:2
-            container_default_behavior: no_defaults
             published_ports:
-              - "{{ kind_registry_port }}:{{ kind_registry_port }}"
-            restart_policy: unless-stopped
+              - "{{ kind_registry_port }}:5000"
+            restart_policy: always
             env:
               REGISTRY_HTTP_HOST: "http://{{ kind_registry_hostname }}:5000"
             network_mode: "{{ kind_network_name }}"
@@ -128,8 +127,7 @@
             state: started
             name: '{{ kind_proxy_container }}'
             image: registry:2
-            container_default_behavior: no_defaults
-            restart_policy: unless-stopped
+            restart_policy: always
             env:
               REGISTRY_HTTP_HOST: "http://{{ kind_proxy_hostname }}:5000"
             network_mode: "{{ kind_network_name }}"
