@@ -24,6 +24,7 @@ provisioner:
           kind_kubeconfig: ${MOLECULE_EPHEMERAL_DIRECTORY}/config
           kind_cluster_name: molecule-kind
           kind_nodes: 4
-          kind_registry_port: 5001
+          kind_registry_deploy: true
+          kind_registry_port: 5000
 verifier:
   name: ansible

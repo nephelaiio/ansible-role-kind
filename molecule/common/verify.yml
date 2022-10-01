@@ -59,3 +59,20 @@
         kind_target_nodes: "{{ kind_nodes }}"
         kind_node_num: "{{ kind_node_query.stdout_lines | length }}"
       when: kind_node_num | int != kind_target_nodes | int
+
+    - block:
+
+        - name: pull test image
+          community.docker.docker_image:
+            name: "kindest/node:{{ lookup('ansible.builtin.env', 'KIND_IMAGE') }}"
+            source: pull
+
+        - name: tag and push to local registry
+          community.docker.docker_image:
+            name: kindest/node
+            repository: "{{ kind_registry_hostname | default('localhost') }}:{{ kind_registry_port }}/kindest/node"
+            tag: "{{ lookup('ansible.builtin.env', 'KIND_IMAGE') }}"
+            push: true
+            source: local
+
+      when: kind_registry_deploy | bool
