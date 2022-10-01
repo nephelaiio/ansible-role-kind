@@ -127,7 +127,7 @@
             name: '{{ kind_proxy_container }}'
             image: registry:2
             env:
-              REGISTRY_HTTP_HOST: "https://{{ kind_proxy_hostname }}:5000"
+              REGISTRY_HTTP_HOST: "http://{{ kind_proxy_hostname }}:5000"
             container_default_behavior: no_defaults
             restart_policy: unless-stopped
             network_mode: "{{ kind_network_name }}"
