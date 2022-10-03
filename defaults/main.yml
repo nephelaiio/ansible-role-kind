@@ -16,3 +16,4 @@ kind_proxy_deploy: true
 kind_proxy_container: "{{ kind_cluster_name }}-proxy"
 kind_proxy_hostname: "{{ kind_proxy_container }}"
 kind_proxy_cleanup: true
+kind_nodes: 4
