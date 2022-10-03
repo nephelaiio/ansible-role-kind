@@ -22,6 +22,7 @@ With default values role will instanciate a 4 node cluster using latest kind rel
 | kind_registry_cleanup  |           true | string  | false    | Destroy local registry container with cluster                                      |
 | kind_registry_port     |           5000 | integer | false    | Host bind port for local docker registry                                           |
 | kind_proxy_cleanup     |           true | string  | false    | Destroy proxy registry container with cluster                                      |
+| kind_nodes             |              4 | integer | false    | Cluster size                                                                       |
 
 ## Dependencies
 
