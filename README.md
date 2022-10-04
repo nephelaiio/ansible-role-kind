@@ -9,20 +9,27 @@ An [ansible role](https://galaxy.ansible.com/nephelaiio/kind) to install and des
 
 With default values role will instanciate a 4 node cluster using latest kind release and image. The following is the list of user serviceable variables
 
-| Parameter              |        Default | Type    | Required | Description                                                                        |
-|:-----------------------|---------------:|:--------|:---------|------------------------------------------------------------------------------------|
-| kind_release_tag       |         latest | string  | false    | Taken from Kind's [release page](https://github.com/kubernetes-sigs/kind/releases) |
-| kind_image_tag         |         latest | string  | false    | Taken from [docker hub](https://hub.docker.com/r/kindest/node/tags)                |
-| kind_cluster_state     |        present | string  | false    | Whether to create ('present') or destroy ('absent') the target cluster             |
-| kind_cluster_name      |           kind | string  | false    | Name of the cluster to create/destroy                                              |
-| kind_network_addr      |   172.160.0/16 | string  | false    | Subnet for kind docker network                                                     |
-| kind_kubeconfig        | ~/.kube/config | string  | false    | Path to store kubeconfig file for the cluster                                      |
-| kind_bin               |    _undefined_ | string  | false    | Path to store kind bin used to deploy the cluster                                  |
-| kind_registry_hostname |      localhost | string  | false    | Hostname for local docker registry                                                 |
-| kind_registry_cleanup  |           true | string  | false    | Destroy local registry container with cluster                                      |
-| kind_registry_port     |           5000 | integer | false    | Host bind port for local docker registry                                           |
-| kind_proxy_cleanup     |           true | string  | false    | Destroy proxy registry container with cluster                                      |
-| kind_nodes             |              4 | integer | false    | Cluster size                                                                       |
+| Parameter              |        Default | Type    | Required  | Description                                                                        |
+|:-----------------------|---------------:|:--------|:----------|------------------------------------------------------------------------------------|
+| kind_release_tag       |         latest | string  | false     | Taken from Kind's [release page](https://github.com/kubernetes-sigs/kind/releases) |
+| kind_image_tag         |         latest | string  | false     | Taken from [docker hub](https://hub.docker.com/r/kindest/node/tags)                |
+| kind_cluster_state     |        present | string  | false     | Whether to create ('present') or destroy ('absent') the target cluster             |
+| kind_cluster_name      |           kind | string  | false     | Name of the cluster to create/destroy                                              |
+| kind_network_addr      |   172.160.0/16 | string  | false     | Subnet for kind docker network                                                     |
+| kind_kubeconfig        | ~/.kube/config | string  | false     | Path to store kubeconfig file for the cluster                                      |
+| kind_bin               |    _undefined_ | string  | false     | Path to store kind bin used to deploy the cluster                                  |
+| kind_registry_deploy   |          false | bool    | false     | Create local registry container                                                    |
+| kind_registry_enable   |          false | bool    | false     | Add local registry container to cluster configuration                                                    |
+| kind_registry_hostname |      localhost | string  | localhost | Hostname for local docker registry                                                 |
+| kind_registry_endpoint |      localhost | string  | localhost | Endpoint for local docker registry                                                 |
+| kind_registry_cleanup  |           true | string  | false     | Destroy local registry container with cluster                                      |
+| kind_registry_port     |           5000 | integer | false     | Host bind port for local docker registry                                           |
+| kind_proxy_deploy      |          false | bool    | false     | Deploy proxy registry container                                                    |
+| kind_proxy_enable      |          false | bool    | false     | Configure proxy registry container in cluster                                      |
+| kind_proxy_hostname    |      localhost | string  | false     | Hostname for proxy registry                                                        |
+| kind_proxy_endpoint    |      localhost | string  | false     | Endpoint for proxy registry                                                        |
+| kind_proxy_cleanup     |           true | string  | false     | Add proxy registry container to cluster configuration                                      |
+| kind_nodes             |              4 | integer | false     | Cluster size                                                                       |
 
 ## Dependencies
 
