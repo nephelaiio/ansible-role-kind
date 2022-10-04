@@ -121,7 +121,7 @@
               - name: "{{ kind_network_name }}"
                 aliases:
                   - "{{ kind_registry_hostname }}"
-            when: kind_registry_deploy | bool
+          when: kind_registry_deploy | bool
 
         - name: deploy docker registry proxy
           community.docker.docker_container:
@@ -136,7 +136,7 @@
               - name: "{{ kind_network_name }}"
                 aliases:
                   - "{{ kind_proxy_hostname }}"
-            when: kind_proxy_deploy | bool
+          when: kind_proxy_deploy | bool
 
       when: kind_cluster_state != 'absent'
 
