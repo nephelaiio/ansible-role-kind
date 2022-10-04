@@ -106,15 +106,31 @@
             _supernet: "{{ kind_network_addr }}"
             _subnet: "{{ _supernet | ansible.utils.ipsubnet(24, 1) }}"
 
+        - name: query private registry container info
+          community.docker.docker_container_info:
+            name: "{{ kind_registry_container }}"
+          register: kind_registry_query
+          changed_when: false
+
         - name: deploy docker private registry
           ansible.builtin.command: >
             docker run --name {{ kind_registry_container }} --net {{ kind_network_name }} --net-alias {{ kind_registry_hostname }} -d -p 5000:5000 registry:2
-          when: kind_registry_deploy | bool
+          when:
+            - kind_registry_deploy | bool
+            - not kind_registry_query.exists
+
+        - name: query proxy container info
+          community.docker.docker_container_info:
+            name: "{{ kind_proxy_container }}"
+          register: kind_proxy_query
+          changed_when: false
 
         - name: deploy docker registry proxy
           ansible.builtin.command: >
             docker run --name {{ kind_proxy_container }} --net {{ kind_network_name }} --net-alias {{ kind_proxy_hostname }} -d registry:2
-          when: kind_proxy_deploy | bool
+          when:
+            - kind_proxy_deploy | bool
+            - not kind_proxy_query.exists
 
       when: kind_cluster_state != 'absent'
 
