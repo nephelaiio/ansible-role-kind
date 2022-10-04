@@ -29,3 +29,17 @@ provisioner:
           kind_registry_port: 5000
 verifier:
   name: ansible
+scenario:
+  test_sequence:
+    - dependency
+    - lint
+    - cleanup
+    - destroy
+    - syntax
+    - create
+    - prepare
+    - converge
+    - verify
+    - side_effect
+    - cleanup
+    - destroy

@@ -107,34 +107,14 @@
             _subnet: "{{ _supernet | ansible.utils.ipsubnet(24, 1) }}"
 
         - name: deploy docker private registry
-          community.docker.docker_container:
-            state: started
-            name: '{{ kind_registry_container }}'
-            image: registry:2
-            published_ports:
-              - "{{ kind_registry_port }}:5000"
-            restart_policy: always
-            env:
-              REGISTRY_HTTP_HOST: "http://{{ kind_registry_hostname }}:5000"
-            network_mode: "{{ kind_network_name }}"
-            networks:
-              - name: "{{ kind_network_name }}"
-                aliases:
-                  - "{{ kind_registry_hostname }}"
+          ansible.builtin.command: >
+            docker run --name {{ kind_registry_container }} --net {{ kind_network_name }} --net-alias {{ kind_registry_hostname }} -d -p 5000:5000 registry:2
+          when: kind_registry_deploy | bool
 
         - name: deploy docker registry proxy
-          community.docker.docker_container:
-            state: started
-            name: '{{ kind_proxy_container }}'
-            image: registry:2
-            restart_policy: always
-            env:
-              REGISTRY_HTTP_HOST: "http://{{ kind_proxy_hostname }}:5000"
-            network_mode: "{{ kind_network_name }}"
-            networks:
-              - name: "{{ kind_network_name }}"
-                aliases:
-                  - "{{ kind_proxy_hostname }}"
+          ansible.builtin.command: >
+            docker run --name {{ kind_proxy_container }} --net {{ kind_network_name }} --net-alias {{ kind_proxy_hostname }} -d registry:2
+          when: kind_proxy_deploy | bool
 
       when: kind_cluster_state != 'absent'
 
@@ -180,13 +160,13 @@
           containerdConfigPatches:
           - |-
           {% endif -%}
-          {%- if (kind_proxy_enable | bool) %}
+          {%- if (kind_proxy_deploy | bool) %}
             [plugins."io.containerd.grpc.v1.cri".registry.mirrors."{{ kind_registry_hostname }}:5000"]
-              endpoint = ["http://{{ kind_registry_endpoint }}:5000"]
+              endpoint = ["http://{{ kind_registry_hostname }}:5000"]
           {% endif -%}
-          {%- if (kind_registry_enable | bool) %}
+          {%- if (kind_registry_deploy | bool) %}
             [plugins."io.containerd.grpc.v1.cri".registry.mirrors."docker.io"]
-              endpoint = ["http://{{ kind_proxy_endpoint }}:5000"]
+              endpoint = ["http://{{ kind_proxy_hostname }}:5000"]
           {% endif -%}
 
     - name: create cluster configuration file
