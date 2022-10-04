@@ -19,15 +19,11 @@ With default values role will instanciate a 4 node cluster using latest kind rel
 | kind_kubeconfig        | ~/.kube/config | string  | false     | Path to store kubeconfig file for the cluster                                      |
 | kind_bin               |    _undefined_ | string  | false     | Path to store kind bin used to deploy the cluster                                  |
 | kind_registry_deploy   |          false | bool    | false     | Create local registry container                                                    |
-| kind_registry_enable   |          false | bool    | false     | Add local registry container to cluster configuration                                                    |
 | kind_registry_hostname |      localhost | string  | localhost | Hostname for local docker registry                                                 |
-| kind_registry_endpoint |      localhost | string  | localhost | Endpoint for local docker registry                                                 |
 | kind_registry_cleanup  |           true | string  | false     | Destroy local registry container with cluster                                      |
 | kind_registry_port     |           5000 | integer | false     | Host bind port for local docker registry                                           |
 | kind_proxy_deploy      |          false | bool    | false     | Deploy proxy registry container                                                    |
-| kind_proxy_enable      |          false | bool    | false     | Configure proxy registry container in cluster                                      |
 | kind_proxy_hostname    |      localhost | string  | false     | Hostname for proxy registry                                                        |
-| kind_proxy_endpoint    |      localhost | string  | false     | Endpoint for proxy registry                                                        |
 | kind_proxy_cleanup     |           true | string  | false     | Add proxy registry container to cluster configuration                                      |
 | kind_nodes             |              4 | integer | false     | Cluster size                                                                       |
 
