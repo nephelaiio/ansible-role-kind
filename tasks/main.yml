@@ -140,13 +140,13 @@
 
     - block:
 
-        - name: deploy docker private registry
+        - name: destroy docker private registry
           community.docker.docker_container:
             state: absent
             name: '{{ kind_registry_container }}'
           when: kind_registry_cleanup | bool
 
-        - name: deploy docker registry proxy
+        - name: destroy docker registry proxy
           community.docker.docker_container:
             state: absent
             name: '{{ kind_proxy_container }}'
@@ -180,13 +180,13 @@
           containerdConfigPatches:
           - |-
           {% endif -%}
-          {%- if (kind_proxy_deploy | bool) %}
+          {%- if (kind_proxy_enable | bool) %}
             [plugins."io.containerd.grpc.v1.cri".registry.mirrors."{{ kind_registry_hostname }}:5000"]
-              endpoint = ["http://{{ kind_registry_hostname }}:5000"]
+              endpoint = ["http://{{ kind_registry_endpoint }}:5000"]
           {% endif -%}
-          {%- if (kind_registry_deploy | bool) %}
+          {%- if (kind_registry_enable | bool) %}
             [plugins."io.containerd.grpc.v1.cri".registry.mirrors."docker.io"]
-              endpoint = ["http://{{ kind_proxy_hostname }}:5000"]
+              endpoint = ["http://{{ kind_proxy_endpoint }}:5000"]
           {% endif -%}
 
     - name: create cluster configuration file
