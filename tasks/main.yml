@@ -104,7 +104,7 @@
                 iprange: "{{ _subnet }}"
           vars:
             _supernet: "{{ kind_network_addr }}"
-            _subnet: "{{ _supernet | ansible.utils.ipsubnet(24, 1) }}"
+            _subnet: "{{ _supernet | ansible.utils.ipsubnet(24, 0) }}"
 
         - name: query private registry container info
           community.docker.docker_container_info:
