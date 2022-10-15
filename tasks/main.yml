@@ -176,11 +176,11 @@
           containerdConfigPatches:
           - |-
           {% endif -%}
-          {%- if (kind_proxy_deploy | bool) %}
+          {%- if (kind_registry_deploy | bool) %}
             [plugins."io.containerd.grpc.v1.cri".registry.mirrors."{{ kind_registry_hostname }}:5000"]
               endpoint = ["http://{{ kind_registry_hostname }}:5000"]
           {% endif -%}
-          {%- if (kind_registry_deploy | bool) %}
+          {%- if (kind_proxy_deploy | bool) %}
             [plugins."io.containerd.grpc.v1.cri".registry.mirrors."docker.io"]
               endpoint = ["http://{{ kind_proxy_hostname }}:5000"]
           {% endif -%}
