@@ -26,6 +26,6 @@ provisioner:
           kind_nodes: 1
           kind_proxy_deploy: false
           kind_registry_deploy: false
-          kind_registry_port: 5000
+          kind_registry_port: 49153
 verifier:
   name: ansible

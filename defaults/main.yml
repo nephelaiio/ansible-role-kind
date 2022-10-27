@@ -10,7 +10,7 @@ kind_network_addr: 172.19.0.0/16
 kind_registry_deploy: true
 kind_registry_container: "{{ kind_cluster_name }}-registry"
 kind_registry_hostname: "localhost"
-kind_registry_port: 5000
+kind_registry_port: 49153
 kind_registry_cleanup: true
 kind_proxy_deploy: true
 kind_proxy_container: "{{ kind_cluster_name }}-proxy"

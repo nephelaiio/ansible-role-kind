@@ -25,6 +25,6 @@ provisioner:
           kind_cluster_name: molecule-kind
           kind_nodes: 4
           kind_registry_deploy: true
-          kind_registry_port: 5000
+          kind_registry_port: 49153
 verifier:
   name: ansible
