@@ -24,9 +24,8 @@ With default values role will instanciate a 4 node cluster using latest kind rel
 | kind_registry_port     |           5000 | integer | false     | Host bind port for local docker registry                                           |
 | kind_proxy_deploy      |          false | bool    | false     | Deploy proxy registry container                                                    |
 | kind_proxy_hostname    |      localhost | string  | false     | Hostname for proxy registry                                                        |
-| kind_proxy_cleanup     |           true | string  | false     | Add proxy registry container to cluster configuration                                      |
+| kind_proxy_cleanup     |           true | string  | false     | Add proxy registry container to cluster configuration                              |
 | kind_nodes             |              4 | integer | false     | Cluster size                                                                       |
-
 ## Dependencies
 
 ### System
@@ -34,6 +33,10 @@ With default values role will instanciate a 4 node cluster using latest kind rel
 The below requirements are needed on the host that executes this module.
 * Linux 64 bit OS
 * kubectl binary is available on path
+
+This role is compatible with arm64 distributions. You must gather facts before running this role for this to work as intended.
+
+For this role to run on apple silicon devices you **must** export the environment variable `DOCKER_HOST` to `unix:///$HOME/.docker/run/docker.sock`. The default `unix:///var/run/docker.sock` is not available on MacOS
 
 ### Ansible
 
