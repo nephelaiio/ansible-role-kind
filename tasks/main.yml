@@ -62,22 +62,10 @@
 
         - name: download kind executable
           ansible.builtin.get_url:
-            url: "https://kind.sigs.k8s.io/dl/{{ kind_release }}/kind-linux-amd64"
+            url: "https://kind.sigs.k8s.io/dl/{{ kind_release }}/kind-{{ kind_release_family }}-{{ kind_release_architecture }}"
             dest: "{{ _kind_bin }}"
             mode: 0755
-          when:
-            - not (kind_bin_file.stat.exists | bool)
-            - ansible_architecture | default('x86_64') == "x86_64"
-          changed_when: false
-
-        - name: download kind executable (ARM)
-          ansible.builtin.get_url:
-            url: "https://kind.sigs.k8s.io/dl/{{ kind_release }}/kind-linux-arm64"
-            dest: "{{ _kind_bin }}"
-            mode: 0755
-          when:
-            - not (kind_bin_file.stat.exists | bool)
-            - ansible_architecture | default('x86_64') == "arm64"
+          when: not (kind_bin_file.stat.exists | bool)
           changed_when: false
 
       rescue:
