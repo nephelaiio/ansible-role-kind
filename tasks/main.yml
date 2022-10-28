@@ -182,7 +182,7 @@
           {% endif -%}
           {%- if (kind_proxy_deploy | bool) %}
             [plugins."io.containerd.grpc.v1.cri".registry.mirrors."docker.io"]
-              endpoint = ["http://{{ kind_proxy_hostname }}:{{ kind_registry_port }}"]
+              endpoint = ["http://{{ kind_proxy_hostname }}:5000"]
           {% endif -%}
 
     - name: create cluster configuration file
