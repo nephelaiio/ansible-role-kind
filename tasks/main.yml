@@ -29,36 +29,38 @@
   ansible.builtin.set_fact:
     _kind_bin: "{{ kind_tmpdir.path }}/kind"
 
-- block:
+- name: manage kind cluster
+  block:
 
-    - name: set kind release to latest tag
+    - name: setup kind binary
       block:
 
-        - name: query kind releases
-          ansible.builtin.uri:
-            url: "https://api.github.com/repos/kubernetes-sigs/kind/releases/{{ kind_release_tag }}"
-          register: kind_release_query
+        - name: set kind release to latest tag
+          block:
 
-        - name: set kind release target
+            - name: query kind releases
+              ansible.builtin.uri:
+                url: "https://api.github.com/repos/kubernetes-sigs/kind/releases/{{ kind_release_tag }}"
+              register: kind_release_query
+
+            - name: set kind release target
+              ansible.builtin.set_fact:
+                kind_release_tag: "{{ kind_release_query.json.tag_name }}"
+
+          when: kind_release_tag == 'latest' or kind_release_tag | length == 0
+
+        - name: set kind release to requested tag
           ansible.builtin.set_fact:
-            kind_release_tag: "{{ kind_release_query.json.tag_name }}"
+            kind_release: "{{ kind_release_tag }}"
 
-      when: kind_release_tag == 'latest' or kind_release_tag | length == 0
+        - name: debug kind image release
+          ansible.builtin.debug:
+            msg: "Using kind release '{{ kind_release_tag }}', image 'kindest/node:{{ kind_image_tag }}'"
 
-    - name: set kind release to requested tag
-      ansible.builtin.set_fact:
-        kind_release: "{{ kind_release_tag }}"
-
-    - name: debug kind image release
-      ansible.builtin.debug:
-        msg: "Using kind release '{{ kind_release_tag }}', image 'kindest/node:{{ kind_image_tag }}'"
-
-    - name: stat kind executable
-      ansible.builtin.stat:
-        path: "{{ _kind_bin }}"
-      register: kind_bin_file
-
-    - block:
+        - name: stat kind executable
+          ansible.builtin.stat:
+            path: "{{ _kind_bin }}"
+          register: kind_bin_file
 
         - name: download kind executable
           ansible.builtin.get_url:
@@ -79,7 +81,9 @@
           ansible.builtin.set_fact:
             _kind_bin: "{{ kind_bin_query.stdout }}"
 
-    - block:
+    - name: copy kind executable
+      when: kind_bin is defined
+      block:
 
         - name: copy kind executable to requested location
           ansible.builtin.copy:
@@ -91,9 +95,9 @@
           ansible.builtin.debug:
             msg: "Using kind binary release '{{ kind_release_tag }}' at path '{{ kind_bin }}'"
 
-      when: kind_bin is defined
-
-    - block:
+    - name: create kind proxies
+      when: kind_cluster_state != 'absent'
+      block:
 
         - name: create docker kind network
           community.docker.docker_network:
@@ -132,9 +136,9 @@
             - kind_proxy_deploy | bool
             - not kind_proxy_query.exists
 
-      when: kind_cluster_state != 'absent'
-
-    - block:
+    - name: destroy kind proxies
+      when: kind_cluster_state == 'absent'
+      block:
 
         - name: destroy docker private registry
           community.docker.docker_container:
@@ -147,8 +151,6 @@
             state: absent
             name: '{{ kind_proxy_container }}'
           when: kind_proxy_cleanup | bool
-
-      when: kind_cluster_state == 'absent'
 
     - name: list kind clusters
       ansible.builtin.command: >-
