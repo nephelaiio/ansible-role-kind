@@ -32,7 +32,17 @@
 - name: manage kind cluster
   block:
 
-    - name: setup kind binary
+    - name: check local kind binary
+      ansible.builtin.shell: which kind
+      register: kind_bin_query
+      changed_when: false
+
+    - name: record local kind binary
+      ansible.builtin.set_fact:
+        _kind_bin: "{{ kind_bin_query.stdout }}"
+
+    - name: download kind binary
+      when: kind_release_download or kind_bin_query is not succeeded
       block:
 
         - name: set kind release to latest tag
@@ -70,19 +80,7 @@
           when: not (kind_bin_file.stat.exists | bool)
           changed_when: false
 
-      rescue:
-
-        - name: check local kind binary
-          ansible.builtin.shell: which kind
-          register: kind_bin_query
-          changed_when: false
-
-        - name: override local kind binary
-          ansible.builtin.set_fact:
-            _kind_bin: "{{ kind_bin_query.stdout }}"
-
     - name: copy kind executable
-      when: kind_bin is defined
       block:
 
         - name: copy kind executable to requested location
@@ -93,7 +91,7 @@
 
         - name: debug kind bin release
           ansible.builtin.debug:
-            msg: "Using kind binary release '{{ kind_release_tag }}' at path '{{ kind_bin }}'"
+            msg: "Using kind binary release at path '{{ kind_bin }}'"
 
     - name: create kind proxies
       when: kind_cluster_state != 'absent'
@@ -191,6 +189,7 @@
       ansible.builtin.copy:
         dest: "{{ kind_config_path }}"
         content: "{{ kind_config_content }}"
+        mode: 0640
       changed_when: false
 
     - name: deploy kind cluster
