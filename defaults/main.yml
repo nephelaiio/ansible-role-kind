@@ -20,5 +20,5 @@ kind_nodes: 4
 kind_release_family: "{{ (ansible_os_family | default('linux') == 'Darwin') | ternary('darwin', 'linux') }}"
 kind_release_architecture: "{{ kind_release_architecture_map[ansible_architecture] }}"
 kind_release_architecture_map:
-  x84_64: amd64
+  x86_64: amd64
   arm64: arm64
