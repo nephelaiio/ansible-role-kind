@@ -81,6 +81,7 @@
           changed_when: false
 
     - name: copy kind executable
+      when: kind_bin is defined
       block:
 
         - name: copy kind executable to requested location
