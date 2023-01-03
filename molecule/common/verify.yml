@@ -23,10 +23,10 @@
     - name: override kind binary path
       ansible.builtin.set_fact:
         _kind_bin: "{{ kind_bin_query.stdout }}"
-      when: not kind_release_download and kind_bin_query is succeeded
+      when: kind_bin_query is succeeded
 
     - name: download kind binary
-      when: kind_release_download or kind_bin_query is not succeeded
+      when: kind_bin_query is not succeeded
       block:
 
         - name: set kind release to latest tag
