@@ -17,7 +17,7 @@ kind_proxy_container: "{{ kind_cluster_name }}-proxy"
 kind_proxy_hostname: "{{ kind_proxy_container }}"
 kind_proxy_cleanup: true
 kind_nodes: 4
-kind_release_family: "{{ (ansible_os_family == 'Darwin') | ternary('darwin', 'linux') }}"
+kind_release_family: "{{ (ansible_os_family | default('linux') == 'Darwin') | ternary('darwin', 'linux') }}"
 kind_release_architecture: "{{ kind_release_architecture_map[ansible_architecture] }}"
 kind_release_architecture_map:
   x84_64: amd64
