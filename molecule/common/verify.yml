@@ -11,25 +11,57 @@
       debug:
         msg: "using kubeconfig at {{ kind_kubeconfig }}"
 
-    - name: set kind deployment target
+    - name: set default kind binary path
       ansible.builtin.set_fact:
         _kind_bin: "{{ _tmpdir }}/kind"
 
-    - name: query kind releases
-      ansible.builtin.uri:
-        url: "https://api.github.com/repos/kubernetes-sigs/kind/releases/latest"
-      register: kind_release_query
-
-    - name: set kind release target
-      ansible.builtin.set_fact:
-        kind_release: "{{ kind_release_query.json.tag_name }}"
-
-    - name: download kind executable
-      ansible.builtin.get_url:
-        url: "https://kind.sigs.k8s.io/dl/{{ kind_release }}/kind-linux-amd64"
-        dest: "{{ _kind_bin }}"
-        mode: 0777
+    - name: check local kind binary
+      ansible.builtin.shell: which kind
+      register: kind_bin_query
       changed_when: false
+
+    - name: override kind binary path
+      ansible.builtin.set_fact:
+        _kind_bin: "{{ kind_bin_query.stdout }}"
+      when: not kind_release_download and kind_bin_query is succeeded
+
+    - name: download kind binary
+      when: kind_release_download or kind_bin_query is not succeeded
+      block:
+
+        - name: set kind release to latest tag
+          when: kind_release_tag == 'latest' or kind_release_tag | length == 0
+          block:
+
+            - name: query kind releases
+              ansible.builtin.uri:
+                url: "https://api.github.com/repos/kubernetes-sigs/kind/releases/{{ kind_release_tag }}"
+              register: kind_release_query
+
+            - name: set kind release target
+              ansible.builtin.set_fact:
+                kind_release_tag: "{{ kind_release_query.json.tag_name }}"
+
+        - name: set kind release to requested tag
+          ansible.builtin.set_fact:
+            kind_release: "{{ kind_release_tag }}"
+
+        - name: debug kind image release
+          ansible.builtin.debug:
+            msg: "Using kind release '{{ kind_release_tag }}', image 'kindest/node:{{ kind_image_tag }}'"
+
+        - name: stat kind executable
+          ansible.builtin.stat:
+            path: "{{ _kind_bin }}"
+          register: kind_bin_file
+
+        - name: download kind executable
+          ansible.builtin.get_url:
+            url: "https://kind.sigs.k8s.io/dl/{{ kind_release }}/kind-{{ kind_release_family }}-{{ kind_release_architecture }}"
+            dest: "{{ _kind_bin }}"
+            mode: 0777
+          when: not (kind_bin_file.stat.exists | bool)
+          changed_when: false
 
     - name: list kind clusters
       ansible.builtin.command: >-
