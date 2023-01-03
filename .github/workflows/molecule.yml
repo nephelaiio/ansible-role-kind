@@ -56,6 +56,8 @@ jobs:
           - singlenode
           - registry
         include:
+          - release: v0.17.0
+            image: v1.25.2
           - release: v0.16.0
             image: v1.25.2
           - release: v0.16.0
@@ -79,6 +81,12 @@ jobs:
 
       - name: install poetry
         run: pip3 install poetry
+
+      - name: install kind
+        uses: engineerd/setup-kind@v0.5.0
+        with:
+          version: "v0.17.0"
+          skipClusterCreation: true
 
       - name: install pips
         run: poetry install
