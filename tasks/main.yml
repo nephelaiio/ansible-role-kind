@@ -25,7 +25,7 @@
   register: kind_tmpdir
   changed_when: false
 
-- name: set kind deployment target
+- name: set default kind binary path
   ansible.builtin.set_fact:
     _kind_bin: "{{ kind_tmpdir.path }}/kind"
 
@@ -37,15 +37,17 @@
       register: kind_bin_query
       changed_when: false
 
-    - name: record local kind binary
+    - name: override kind binary path
       ansible.builtin.set_fact:
         _kind_bin: "{{ kind_bin_query.stdout }}"
+      when: not kind_release_download and kind_bin_query is succeeded
 
     - name: download kind binary
       when: kind_release_download or kind_bin_query is not succeeded
       block:
 
         - name: set kind release to latest tag
+          when: kind_release_tag == 'latest' or kind_release_tag | length == 0
           block:
 
             - name: query kind releases
@@ -56,8 +58,6 @@
             - name: set kind release target
               ansible.builtin.set_fact:
                 kind_release_tag: "{{ kind_release_query.json.tag_name }}"
-
-          when: kind_release_tag == 'latest' or kind_release_tag | length == 0
 
         - name: set kind release to requested tag
           ansible.builtin.set_fact:
@@ -76,7 +76,7 @@
           ansible.builtin.get_url:
             url: "https://kind.sigs.k8s.io/dl/{{ kind_release }}/kind-{{ kind_release_family }}-{{ kind_release_architecture }}"
             dest: "{{ _kind_bin }}"
-            mode: 0755
+            mode: 0777
           when: not (kind_bin_file.stat.exists | bool)
           changed_when: false
 
@@ -92,7 +92,7 @@
 
         - name: debug kind bin release
           ansible.builtin.debug:
-            msg: "Using kind binary release at path '{{ kind_bin }}'"
+            msg: "Using kind binary at path '{{ kind_bin }}'"
 
     - name: create kind proxies
       when: kind_cluster_state != 'absent'
