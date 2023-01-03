@@ -56,6 +56,8 @@ jobs:
           - singlenode
           - registry
         include:
+          - release: v0.17.0
+            image: v1.25.2
           - release: v0.16.0
             image: v1.25.2
           - release: v0.16.0
