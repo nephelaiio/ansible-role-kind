@@ -36,6 +36,7 @@
       ansible.builtin.shell: which kind
       register: kind_bin_query
       changed_when: false
+      ignore_errors: true
 
     - name: override kind binary path
       ansible.builtin.set_fact:
