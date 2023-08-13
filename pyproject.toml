@@ -5,15 +5,15 @@ description = ""
 authors = ["nephelaiio"]
 
 [tool.poetry.dependencies]
-python = "^3.8"
+python = "^3.10"
 
 [tool.poetry.group.dev.dependencies]
 tox = "^3.25.0"
 docker = "^6.0.0"
-molecule = "^3.6.1"
+molecule = "^5.1.0"
 docker-compose = "^1.29.2"
 yamllint = "^1.27.1"
-ansible-lint = "~5"
+ansible-lint = { version = "*", markers = "platform_system != 'Windows'" }
 ansible = "^6.1.0"
 MarkupSafe = "2.0.1"
 pytest = "^7.1.2"
