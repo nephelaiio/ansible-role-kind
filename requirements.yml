@@ -1,5 +1,4 @@
 ---
-roles:
-  - nephelaiio.plugins
+roles: []
 collections:
   - ansible.utils
