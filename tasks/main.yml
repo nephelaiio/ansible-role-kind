@@ -76,7 +76,6 @@
     - name: Copy Kind executable
       when: kind_bin is defined
       block:
-
         - name: Copy Kind executable to requested location
           ansible.builtin.copy:
             src: "{{ _kind_bin }}"
@@ -90,7 +89,6 @@
     - name: Create Kind proxies
       when: kind_cluster_state != 'absent'
       block:
-
         - name: Create docker Kind network
           community.docker.docker_network:
             name: "{{ kind_network_name }}"
