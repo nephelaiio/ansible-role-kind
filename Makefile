@@ -6,18 +6,18 @@ ROLE_NAME := $$(pwd | xargs basename)
 MOLECULE_SCENARIO ?= default
 MOLECULE_EPHEMERAL_DIR := "$$HOME/.cache/molecule/$(ROLE_NAME)/$(SCENARIO)"
 
-test: poetry
+test: install
 	KIND_RELEASE=$(KIND_RELEASE) \
 	KIND_IMAGE=$(KIND_IMAGE) \
 	poetry run molecule $@ -s ${MOLECULE_SCENARIO}
 
-install:
+poetry:
 	@type poetry >/dev/null || pip3 install poetry
 
-poetry: install
+install: poetry
 	@poetry install
 
-lint: poetry
+lint: install
 	poetry run yamllint . && poetry run ansible-lint .
 
 dependency create prepare converge idempotence side-effect verify destroy cleanup reset list:
