@@ -3,18 +3,22 @@
   hosts: localhost
   gather_facts: true
   tasks:
+    - name: Create tempdir
+      ansible.builtin.tempfile:
+        state: directory
+        prefix: kind
+      register: kind_tmpdir
+      changed_when: false
+
     - name: Print debug info
       ansible.builtin.debug:
         msg: "using kubeconfig at {{ kind_kubeconfig }}"
-
-    - name: Set default Kind binary path
-      ansible.builtin.set_fact:
-        _kind_bin: "{{ _tmpdir }}/kind"
 
     - name: Check local Kind binary
       ansible.builtin.shell: which kind
       register: kind_bin_query
       changed_when: false
+      ignore_errors: true
 
     - name: Override Kind binary path
       ansible.builtin.set_fact:
@@ -24,12 +28,15 @@
     - name: Download Kind binary
       when: kind_bin_query is not succeeded
       block:
+        - name: Set default Kind binary path
+          ansible.builtin.set_fact:
+            _kind_bin: "{{ kind_tmpdir.path }}/kind"
+
         - name: Set Kind release to latest tag
-          when: kind_release_tag == 'latest' or kind_release_tag | length == 0
           block:
             - name: Query Kind releases
               ansible.builtin.uri:
-                url: "https://api.github.com/repos/kubernetes-sigs/kind/releases/{{ kind_release_tag }}"
+                url: "https://api.github.com/repos/kubernetes-sigs/kind/releases/latest"
               register: kind_release_query
 
             - name: Set Kind release target
@@ -40,21 +47,14 @@
           ansible.builtin.set_fact:
             kind_release: "{{ kind_release_tag }}"
 
-        - name: Debug Kind image release
-          ansible.builtin.debug:
-            msg: "Using kind release '{{ kind_release_tag }}', image 'kindest/node:{{ kind_image_tag }}'"
-
-        - name: Stat Kind executable
-          ansible.builtin.stat:
-            path: "{{ _kind_bin }}"
-          register: kind_bin_file
-
         - name: Download Kind executable
           ansible.builtin.get_url:
-            url: "https://kind.sigs.k8s.io/dl/{{ kind_release }}/kind-{{ kind_release_family }}-{{ kind_release_architecture }}"
+            url: "https://kind.sigs.k8s.io/dl/{{ kind_release }}/kind-{{ _family }}-{{ _arch }}"
             dest: "{{ _kind_bin }}"
             mode: 0777
-          when: not (kind_bin_file.stat.exists | bool)
+          vars:
+            _family: "{{ ansible_system | lower }}"
+            _arch: "{{ (ansible_architecture == 'x86_64') | ternary('amd64', ansible_architecture) }}"
           changed_when: false
 
     - name: List Kind clusters
@@ -101,3 +101,9 @@
             tag: "{{ lookup('ansible.builtin.env', 'KIND_IMAGE') }}"
             push: true
             source: local
+
+    - name: Destroy tempdir
+      ansible.builtin.file:
+        state: absent
+        path: "{{ kind_tmpdir.path }}"
+      changed_when: false

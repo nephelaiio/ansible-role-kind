@@ -45,7 +45,7 @@
           block:
             - name: Query Kind releases
               ansible.builtin.uri:
-                url: "https://api.github.com/repos/kubernetes-sigs/kind/releases/{{ kind_release_tag }}"
+                url: "https://api.github.com/repos/kubernetes-sigs/kind/releases/latest"
               register: kind_release_query
 
             - name: Set Kind release target
@@ -60,31 +60,12 @@
           ansible.builtin.debug:
             msg: "Using kind release '{{ kind_release_tag }}', image 'kindest/node:{{ kind_image_tag }}'"
 
-        - name: Stat Kind executable
-          ansible.builtin.stat:
-            path: "{{ _kind_bin }}"
-          register: kind_bin_file
-
         - name: Download Kind executable
           ansible.builtin.get_url:
             url: "https://kind.sigs.k8s.io/dl/{{ kind_release }}/kind-{{ kind_release_family }}-{{ kind_release_architecture }}"
             dest: "{{ _kind_bin }}"
             mode: 0777
-          when: not (kind_bin_file.stat.exists | bool)
           changed_when: false
-
-    - name: Copy Kind executable
-      when: kind_bin is defined
-      block:
-        - name: Copy Kind executable to requested location
-          ansible.builtin.copy:
-            src: "{{ _kind_bin }}"
-            dest: "{{ kind_bin }}"
-            mode: 0755
-
-        - name: Debug Kind bin release
-          ansible.builtin.debug:
-            msg: "Using kind binary at path '{{ kind_bin }}'"
 
     - name: Create Kind proxies
       when: kind_cluster_state != 'absent'
@@ -107,13 +88,15 @@
           changed_when: false
 
         - name: Deploy docker private registry
-          ansible.builtin.command: >-
-            docker run registry:2
-              --name {{ kind_registry_container }}
-              --net {{ kind_network_name }}
-              --net-alias {{ kind_registry_hostname }}
-              --publish {{ kind_registry_port }}:5000
-              --detach
+          community.docker.docker_container:
+            auto_remove: true
+            name: "{{ kind_registry_container }}"
+            image: registry:2
+            networks:
+              - name: "{{ kind_network_name }}"
+                aliases:
+                  - "{{ kind_registry_hostname }}"
+            published_ports: "{{ kind_registry_port }}:5000"
           when:
             - kind_registry_deploy | bool
             - not kind_registry_query.exists
@@ -126,12 +109,14 @@
           changed_when: false
 
         - name: Deploy docker registry proxy
-          ansible.builtin.command: >-
-            docker run registry:2
-              --name {{ kind_proxy_container }}
-              --net {{ kind_network_name }}
-              --net-alias {{ kind_proxy_hostname }}
-              --detach
+          community.docker.docker_container:
+            auto_remove: true
+            name: "{{ kind_proxy_container }}"
+            image: registry:2
+            networks:
+              - name: "{{ kind_network_name }}"
+                aliases:
+                  - "{{ kind_proxy_hostname }}"
           when:
             - kind_proxy_deploy | bool
             - not kind_proxy_query.exists
@@ -216,9 +201,8 @@
         - kind_cluster_name in kind_cluster_query.stdout_lines
       changed_when: false
 
-  always:
-    - name: Destroy tempdir
-      ansible.builtin.file:
-        state: absent
-        path: "{{ kind_tmpdir.path }}"
-      changed_when: false
+- name: Destroy tempdir
+  ansible.builtin.file:
+    state: absent
+    path: "{{ kind_tmpdir.path }}"
+  changed_when: false
