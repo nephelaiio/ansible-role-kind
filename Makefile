@@ -40,7 +40,7 @@ ifeq (helm,$(firstword $(MAKECMDGOALS)))
 endif
 
 helm:
-	KUBECONFIG=$(MOLECULE_EPHEMERAL_DIR)/config helm ${HELM_ARGS}
+	KUBECONFIG=$(MOLECULE_EPHEMERAL_DIR)/config $@ ${HELM_ARGS}
 
 ifeq (kubectl,$(firstword $(MAKECMDGOALS)))
     KUBECTL_ARGS := $(wordlist 2,$(words $(MAKECMDGOALS)),$(MAKECMDGOALS))
@@ -48,4 +48,4 @@ ifeq (kubectl,$(firstword $(MAKECMDGOALS)))
 endif
 
 kubectl:
-	@KUBECONFIG=$(MOLECULE_EPHEMERAL_DIR)/config kubectl ${KUBECTL_ARGS}
+	@KUBECONFIG=$(MOLECULE_EPHEMERAL_DIR)/config $@ ${KUBECTL_ARGS}
