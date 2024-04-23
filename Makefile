@@ -17,7 +17,7 @@ install:
 poetry: install
 	@poetry instsall
 
-lint: install
+lint: poetry
 	poetry run yamllint . && poetry run ansible-lint .
 
 dependency create prepare converge idempotence side-effect verify destroy cleanup reset list:
