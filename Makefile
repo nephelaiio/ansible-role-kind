@@ -15,9 +15,10 @@ poetry:
 	@type poetry >/dev/null || pip3 install poetry
 
 install: poetry
-	@poetry install
+	@poetry install --only dev
 
 lint: install
+	@poetry install --only lint ; \
 	poetry run yamllint . && poetry run ansible-lint .
 
 dependency create prepare converge idempotence side-effect verify destroy cleanup reset list:
