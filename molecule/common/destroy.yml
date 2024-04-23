@@ -7,7 +7,6 @@
     kind_registry_container: "{{ kind_cluster_name }}-registry"
     kind_proxy_container: "{{ kind_cluster_name }}-proxy"
   roles:
-    - nephelaiio.plugins
     - nephelaiio.kind
   tasks:
     - name: Query local registry container info

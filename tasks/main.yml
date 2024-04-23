@@ -2,7 +2,7 @@
 - name: Check desired cluster status
   ansible.builtin.assert:
     that: kind_cluster_state in kind_valid_states
-    fail_msg: "kind_cluster_state must be one of [{{ kind_valid_states | map('map_format', \"'%s'\") | join(', ') }}]"
+    fail_msg: "kind_cluster_state must be one of [{{ kind_valid_states | join(', ') }}]"
   vars:
     kind_valid_states:
       - present

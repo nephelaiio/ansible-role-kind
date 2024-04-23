@@ -18,5 +18,4 @@ galaxy_info:
         - all
   galaxy_tags: ['kind']
 
-dependencies:
-  - nephelaiio.plugins
+dependencies: []
