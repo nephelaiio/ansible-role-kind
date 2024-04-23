@@ -1,11 +1,7 @@
 ---
-- name: converge
-
+- name: Converge
   hosts: localhost
-
   gather_facts: true
-
   roles:
-
     - nephelaiio.plugins
     - nephelaiio.kind
