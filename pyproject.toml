@@ -5,18 +5,17 @@ description = ""
 authors = ["nephelaiio"]
 
 [tool.poetry.dependencies]
-python = "^3.10"
+python = "^3.11"
 
 [tool.poetry.group.dev.dependencies]
-tox = "^3.25.0"
-docker = "^6.0.0"
-molecule = "^5.1.0"
+ansible = "^9.3.0"
+molecule = "^24.2.1"
+docker = "^7.0.0"
+netaddr = "^1.2.1"
+ansible-lint = { version = "^24.2.0", markers = "platform_system != 'Windows'" }
 yamllint = "^1.27.1"
-ansible-lint = { version = "*", markers = "platform_system != 'Windows'" }
-ansible = "^8.2.0"
-MarkupSafe = "2.0.1"
-pytest = "^7.1.2"
-netaddr = "^0.8.0"
+
+[tool.poetry.group.lint.dependencies]
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]

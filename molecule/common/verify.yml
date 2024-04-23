@@ -1,105 +1,100 @@
 ---
-- name: verify
-
+- name: Verify
   hosts: localhost
-
   gather_facts: true
-
   tasks:
+    - name: Create tempdir
+      ansible.builtin.tempfile:
+        state: directory
+        prefix: kind
+      register: kind_tmpdir
+      changed_when: false
 
-    - name: print kubeconfig debug info
-      debug:
+    - name: Print debug info
+      ansible.builtin.debug:
         msg: "using kubeconfig at {{ kind_kubeconfig }}"
 
-    - name: set default kind binary path
-      ansible.builtin.set_fact:
-        _kind_bin: "{{ _tmpdir }}/kind"
-
-    - name: check local kind binary
+    - name: Check local Kind binary
       ansible.builtin.shell: which kind
       register: kind_bin_query
       changed_when: false
+      ignore_errors: true
 
-    - name: override kind binary path
+    - name: Override Kind binary path
       ansible.builtin.set_fact:
         _kind_bin: "{{ kind_bin_query.stdout }}"
       when: kind_bin_query is succeeded
 
-    - name: download kind binary
+    - name: Download Kind binary
       when: kind_bin_query is not succeeded
       block:
+        - name: Set default Kind binary path
+          ansible.builtin.set_fact:
+            _kind_bin: "{{ kind_tmpdir.path }}/kind"
 
-        - name: set kind release to latest tag
-          when: kind_release_tag == 'latest' or kind_release_tag | length == 0
+        - name: Set Kind release to latest tag
           block:
-
-            - name: query kind releases
+            - name: Query Kind releases
               ansible.builtin.uri:
-                url: "https://api.github.com/repos/kubernetes-sigs/kind/releases/{{ kind_release_tag }}"
+                url: "https://api.github.com/repos/kubernetes-sigs/kind/releases/latest"
               register: kind_release_query
 
-            - name: set kind release target
+            - name: Set Kind release target
               ansible.builtin.set_fact:
                 kind_release_tag: "{{ kind_release_query.json.tag_name }}"
 
-        - name: set kind release to requested tag
+        - name: Set Kind release to requested tag
           ansible.builtin.set_fact:
             kind_release: "{{ kind_release_tag }}"
 
-        - name: debug kind image release
-          ansible.builtin.debug:
-            msg: "Using kind release '{{ kind_release_tag }}', image 'kindest/node:{{ kind_image_tag }}'"
-
-        - name: stat kind executable
-          ansible.builtin.stat:
-            path: "{{ _kind_bin }}"
-          register: kind_bin_file
-
-        - name: download kind executable
+        - name: Download Kind executable
           ansible.builtin.get_url:
-            url: "https://kind.sigs.k8s.io/dl/{{ kind_release }}/kind-{{ kind_release_family }}-{{ kind_release_architecture }}"
+            url: "https://kind.sigs.k8s.io/dl/{{ kind_release }}/kind-{{ _family }}-{{ _arch }}"
             dest: "{{ _kind_bin }}"
             mode: 0777
-          when: not (kind_bin_file.stat.exists | bool)
+          vars:
+            _family: "{{ ansible_system | lower }}"
+            _arch: "{{ (ansible_architecture == 'x86_64') | ternary('amd64', ansible_architecture) }}"
           changed_when: false
 
-    - name: list kind clusters
+    - name: List Kind clusters
       ansible.builtin.command: >-
         {{ _kind_bin }} get clusters -q
       register: kind_cluster_query
       changed_when: false
 
-    - name: check kind cluster state
-      ansible.builtin.fail:
-        msg: "kind cluster {{ kind_cluster_name }} not found"
-      when: kind_cluster_name not in kind_cluster_query.stdout_lines
+    - name: Check Kind cluster state
+      ansible.builtin.assert:
+        that: kind_cluster_name in kind_cluster_query.stdout_lines
+        fail_msg: "kind cluster {{ kind_cluster_name }} not found"
 
-    - name: list cluster nodes
+    - name: List cluster nodes
       ansible.builtin.shell: >-
         KUBECONFIG={{ kind_kubeconfig }} kubectl get nodes --no-headers
       register: kind_node_query
 
-    - name: check kubectl command
-      ansible.builtin.fail:
-        msg: "kubectl call to cluster failed"
-      when: kind_node_query is failed
+    - name: Verify Kubectl node query execution
+      ansible.builtin.assert:
+        that: kind_node_query is succeeded
+        fail_msg: "kubectl call to cluster failed"
 
-    - name: check kind node
-      ansible.builtin.fail:
-        msg: "expected {{ kind_target_nodes }} cluster nodes, got {{ kind_node_num }}"
+    - name: Check Kind node
+      ansible.builtin.assert:
+        that: (kind_node_num | int) == (kind_target_nodes | int)
+        fail_msg: "expected {{ kind_target_nodes }} cluster nodes, got {{ kind_node_num }}"
       vars:
         kind_target_nodes: "{{ kind_nodes }}"
         kind_node_num: "{{ kind_node_query.stdout_lines | length }}"
-      when: kind_node_num | int != kind_target_nodes | int
 
-    - block:
-
-        - name: pull test image
+    - name: Deploy Kind image to local repository
+      when: kind_registry_deploy | bool
+      block:
+        - name: Pull Kind image
           community.docker.docker_image:
             name: "kindest/node:{{ lookup('ansible.builtin.env', 'KIND_IMAGE') }}"
             source: pull
 
-        - name: tag and push to local registry
+        - name: Tag and push to local registry
           community.docker.docker_image:
             name: kindest/node
             repository: "{{ kind_registry_hostname | default('localhost') }}:{{ kind_registry_port }}/kindest/node"
@@ -107,4 +102,8 @@
             push: true
             source: local
 
-      when: kind_registry_deploy | bool
+    - name: Destroy tempdir
+      ansible.builtin.file:
+        state: absent
+        path: "{{ kind_tmpdir.path }}"
+      changed_when: false
