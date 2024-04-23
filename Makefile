@@ -14,6 +14,9 @@ test: lint
 install:
 	@type poetry >/dev/null || pip3 install poetry
 
+poetry: install
+	@poetry instsall
+
 lint: install
 	poetry run yamllint . && poetry run ansible-lint .
 
