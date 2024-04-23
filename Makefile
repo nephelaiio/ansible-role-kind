@@ -6,7 +6,7 @@ ROLE_NAME := $$(pwd | xargs basename)
 MOLECULE_SCENARIO ?= default
 MOLECULE_EPHEMERAL_DIR := "$$HOME/.cache/molecule/$(ROLE_NAME)/$(SCENARIO)"
 
-test: lint
+test: poetry
 	KIND_RELEASE=$(KIND_RELEASE) \
 	KIND_IMAGE=$(KIND_IMAGE) \
 	poetry run molecule $@ -s ${MOLECULE_SCENARIO}
