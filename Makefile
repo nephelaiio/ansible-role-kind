@@ -11,10 +11,9 @@ test: install
 	KIND_IMAGE=$(KIND_IMAGE) \
 	poetry run molecule $@ -s ${MOLECULE_SCENARIO}
 
-poetry:
+install:
 	@type poetry >/dev/null || pip3 install poetry
-
-install: poetry
+	@type yq || sudo apt-get install -y yq
 	@poetry install --no-root
 
 lint: install
