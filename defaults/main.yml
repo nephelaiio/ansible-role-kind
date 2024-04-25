@@ -19,4 +19,5 @@ kind_proxy_hostname: "{{ kind_proxy_container }}"
 kind_proxy_cleanup: true
 kind_nodes: 4
 kind_release_family: "{{ (ansible_system | default('linux') | lower) }}"
-kind_release_architecture: "{{ (ansible_architecture == 'x86_64') | ternary('amd64', ansible_architecture) }}"
+kind_architecture: "{{ ansible_architecture | default('x86_64') }}"
+kind_release_architecture: "{{ (kind_architecture == 'x86_64') | ternary('amd64', ansible_architecture) }}"
