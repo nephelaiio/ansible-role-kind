@@ -1,5 +1,4 @@
 ---
-kind_release_download: false
 kind_release_tag: "{{ lookup('ansible.builtin.env', 'KIND_RELEASE', default='latest') }}"
 kind_image_tag: "{{ lookup('ansible.builtin.env', 'KIND_IMAGE', default='latest') }}"
 kind_cluster_state: 'present'

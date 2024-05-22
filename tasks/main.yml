@@ -22,47 +22,35 @@
 
 - name: Set default Kind binary path
   ansible.builtin.set_fact:
-    _kind_bin: "{{ kind_tmpdir.path }}/kind"
+    _kind_bin: "{{ kind_bin | default(_kind_bin_default) }}"
+  vars:
+    _kind_bin_default: "{{ kind_tmpdir.path }}/kind"
 
 - name: Manage Kind cluster
   block:
     - name: Check local Kind binary
-      ansible.builtin.shell: which kind
-      register: kind_bin_query
-      changed_when: false
-      ignore_errors: true
-
-    - name: Override Kind binary path
-      ansible.builtin.set_fact:
-        _kind_bin: "{{ kind_bin_query.stdout }}"
-      when: not kind_release_download and kind_bin_query is succeeded
+      ansible.builtin.stat:
+        path: "{{ _kind_bin }}"
+      register: kind_bin_stat
 
     - name: Download Kind binary
-      when: kind_release_download or kind_bin_query is not succeeded
+      when: not kind_bin_query.stat.exists
       block:
-        - name: Set Kind release to latest tag
-          when: kind_release_tag == 'latest' or kind_release_tag | length == 0
-          block:
-            - name: Query Kind releases
-              ansible.builtin.uri:
-                url: "https://api.github.com/repos/kubernetes-sigs/kind/releases/latest"
-              register: kind_release_query
-
-            - name: Set Kind release target
-              ansible.builtin.set_fact:
-                kind_release_tag: "{{ kind_release_query.json.tag_name }}"
-
         - name: Set Kind release to requested tag
           ansible.builtin.set_fact:
-            kind_release: "{{ kind_release_tag }}"
+            _kind_release_tag: "{{ (kind_release_tag == 'latest') | ternary(_latest, _kind_release_tag) }}"
+          vars:
+            _uri: "https://api.github.com/repos/kubernetes-sigs/kind/releases/latest"
+            _query: "{{ lookup('ansible.builtin.url', _uri, split_lines=False) | from_json }}"
+            _latest: "{{ _query.json.tag_name }}"
 
         - name: Debug Kind image release
           ansible.builtin.debug:
-            msg: "Using kind release '{{ kind_release_tag }}', image 'kindest/node:{{ kind_image_tag }}'"
+            msg: "Using kind release '{{ _kind_release_tag }}', image 'kindest/node:{{ kind_image_tag }}'"
 
         - name: Download Kind executable
           ansible.builtin.get_url:
-            url: "https://kind.sigs.k8s.io/dl/{{ kind_release }}/kind-{{ kind_release_family }}-{{ kind_release_architecture }}"
+            url: "https://kind.sigs.k8s.io/dl/{{ _kind_release_tag }}/kind-{{ kind_release_family }}-{{ kind_release_architecture }}"
             dest: "{{ _kind_bin }}"
             mode: 0777
           changed_when: false
@@ -70,7 +58,7 @@
     - name: Create Kind proxies
       when: kind_cluster_state != 'absent'
       block:
-        - name: Create docker Kind network
+        - name: Create Kind docker network
           community.docker.docker_network:
             name: "{{ kind_network_name }}"
             ipam_config:
