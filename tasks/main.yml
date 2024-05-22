@@ -34,7 +34,7 @@
       register: kind_bin_stat
 
     - name: Download Kind binary
-      when: not kind_bin_query.stat.exists
+      when: not kind_bin_stat.stat.exists
       block:
         - name: Set Kind release to requested tag
           ansible.builtin.set_fact:
