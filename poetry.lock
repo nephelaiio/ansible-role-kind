@@ -913,13 +913,13 @@ rpds-py = ">=0.7.0"
 
 [[package]]
 name = "requests"
-version = "2.32.2"
+version = "2.31.0"
 description = "Python HTTP for Humans."
 optional = false
-python-versions = ">=3.8"
+python-versions = ">=3.7"
 files = [
-    {file = "requests-2.32.2-py3-none-any.whl", hash = "sha256:fc06670dd0ed212426dfeb94fc1b983d917c4f9847c863f313c9dfaaffb7c23c"},
-    {file = "requests-2.32.2.tar.gz", hash = "sha256:dd951ff5ecf3e3b3aa26b40703ba77495dab41da839ae72ef3c8e5d8e2433289"},
+    {file = "requests-2.31.0-py3-none-any.whl", hash = "sha256:58cd2187c01e70e6e26505bca751777aa9f2ee0b7f4300988b709f44e013003f"},
+    {file = "requests-2.31.0.tar.gz", hash = "sha256:942c5a758f98d790eaed1a29cb6eefc7ffb0d1cf7af05c3d2791656dbd6ad1e1"},
 ]
 
 [package.dependencies]
@@ -1170,20 +1170,6 @@ zstd = ["zstandard (>=0.18.0)"]
 
 [[package]]
 name = "wcmatch"
-version = "8.4.1"
-description = "Wildcard/glob file name matcher."
-optional = false
-python-versions = ">=3.7"
-files = [
-    {file = "wcmatch-8.4.1-py3-none-any.whl", hash = "sha256:3476cd107aba7b25ba1d59406938a47dc7eec6cfd0ad09ff77193f21a964dee7"},
-    {file = "wcmatch-8.4.1.tar.gz", hash = "sha256:b1f042a899ea4c458b7321da1b5e3331e3e0ec781583434de1301946ceadb943"},
-]
-
-[package.dependencies]
-bracex = ">=2.1.1"
-
-[[package]]
-name = "wcmatch"
 version = "8.5.2"
 description = "Wildcard/glob file name matcher."
 optional = false
@@ -1232,4 +1218,4 @@ testing = ["big-O", "jaraco.functools", "jaraco.itertools", "jaraco.test", "more
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.11"
-content-hash = "fe2b53592d6b026cd77c698d312b673b64a443893e1b83f85cf7c40ae032050c"
+content-hash = "e3ea254e44b00b3e40be50ec2a790fb6fdbd1eaaff782612ecf7f34874c5dfbb"
