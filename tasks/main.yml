@@ -42,7 +42,7 @@
           vars:
             _uri: "https://api.github.com/repos/kubernetes-sigs/kind/releases/latest"
             _query: "{{ lookup('ansible.builtin.url', _uri, split_lines=False) | from_json }}"
-            _latest: "{{ _query.json.tag_name }}"
+            _latest: "{{ _query.tag_name }}"
 
         - name: Debug Kind release and tag
           ansible.builtin.debug:
