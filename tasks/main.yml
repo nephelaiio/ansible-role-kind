@@ -38,7 +38,7 @@
       block:
         - name: Set Kind release to requested tag
           ansible.builtin.set_fact:
-            _kind_release_tag: "{{ (kind_release_tag == 'latest') | ternary(_latest, _kind_release_tag) }}"
+            _kind_release_tag: "{{ (kind_release_tag in ['latest', '']) | ternary(_latest, _kind_release_tag) }}"
           vars:
             _uri: "https://api.github.com/repos/kubernetes-sigs/kind/releases/latest"
             _query: "{{ lookup('ansible.builtin.url', _uri, split_lines=False) | from_json }}"
