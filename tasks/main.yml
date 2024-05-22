@@ -36,15 +36,15 @@
     - name: Download Kind binary
       when: not kind_bin_stat.stat.exists
       block:
-        - name: Set Kind release to requested tag
+        - name: Set target Kind release
           ansible.builtin.set_fact:
-            _kind_release_tag: "{{ (kind_release_tag in ['latest', '']) | ternary(_latest, _kind_release_tag) }}"
+            _kind_release_tag: "{{ (kind_release_tag in ['latest', '']) | ternary(_latest, kind_release_tag) }}"
           vars:
             _uri: "https://api.github.com/repos/kubernetes-sigs/kind/releases/latest"
             _query: "{{ lookup('ansible.builtin.url', _uri, split_lines=False) | from_json }}"
             _latest: "{{ _query.json.tag_name }}"
 
-        - name: Debug Kind image release
+        - name: Debug Kind release and tag
           ansible.builtin.debug:
             msg: "Using kind release '{{ _kind_release_tag }}', image 'kindest/node:{{ kind_image_tag }}'"
 
@@ -52,7 +52,7 @@
           ansible.builtin.get_url:
             url: "https://kind.sigs.k8s.io/dl/{{ _kind_release_tag }}/kind-{{ kind_release_family }}-{{ kind_release_architecture }}"
             dest: "{{ _kind_bin }}"
-            mode: 0777
+            mode: "u=rwx,og=rx"
           changed_when: false
 
     - name: Create Kind proxies
@@ -164,7 +164,7 @@
       ansible.builtin.copy:
         dest: "{{ kind_config_path }}"
         content: "{{ kind_config_content }}"
-        mode: 0640
+        mode: "u=rw,g=r,o="
       changed_when: false
 
     - name: Deploy Kind cluster
