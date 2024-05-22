@@ -1,7 +1,11 @@
 ---
-- name: Verify
+- name: Verify Kind cluster deployment
   hosts: localhost
   gather_facts: true
+  vars:
+    kind_release_family: "{{ (ansible_system | default('linux') | lower) }}"
+    kind_architecture: "{{ ansible_architecture | default('x86_64') }}"
+    kind_release_architecture: "{{ (kind_architecture == 'x86_64') | ternary('amd64', ansible_architecture) }}"
   tasks:
     - name: Create tempdir
       ansible.builtin.tempfile:
@@ -10,51 +14,33 @@
       register: kind_tmpdir
       changed_when: false
 
+    - name: Set default Kind binary path
+      ansible.builtin.set_fact:
+        _kind_bin: "{{ kind_tmpdir.path }}/kind"
+
     - name: Print debug info
       ansible.builtin.debug:
         msg: "using kubeconfig at {{ kind_kubeconfig }}"
 
-    - name: Check local Kind binary
-      ansible.builtin.shell: which kind
-      register: kind_bin_query
-      changed_when: false
-      ignore_errors: true
-
-    - name: Override Kind binary path
-      ansible.builtin.set_fact:
-        _kind_bin: "{{ kind_bin_query.stdout }}"
-      when: kind_bin_query is succeeded
-
     - name: Download Kind binary
-      when: kind_bin_query is not succeeded
       block:
-        - name: Set default Kind binary path
+        - name: Set target Kind release
           ansible.builtin.set_fact:
-            _kind_bin: "{{ kind_tmpdir.path }}/kind"
+            _kind_release_tag: "{{ (kind_release_tag | default('latest') in ['latest', '']) | ternary(_latest, kind_release_tag) }}"
+          vars:
+            _uri: "https://api.github.com/repos/kubernetes-sigs/kind/releases/latest"
+            _query: "{{ lookup('ansible.builtin.url', _uri, split_lines=False) | from_json }}"
+            _latest: "{{ _query.tag_name }}"
 
-        - name: Set Kind release to latest tag
-          block:
-            - name: Query Kind releases
-              ansible.builtin.uri:
-                url: "https://api.github.com/repos/kubernetes-sigs/kind/releases/latest"
-              register: kind_release_query
-
-            - name: Set Kind release target
-              ansible.builtin.set_fact:
-                kind_release_tag: "{{ kind_release_query.json.tag_name }}"
-
-        - name: Set Kind release to requested tag
-          ansible.builtin.set_fact:
-            kind_release: "{{ kind_release_tag }}"
+        - name: Debug Kind release and tag
+          ansible.builtin.debug:
+            msg: "Using kind release '{{ _kind_release_tag }}', image 'kindest/node:{{ kind_image_tag | default('latest') }}'"
 
         - name: Download Kind executable
           ansible.builtin.get_url:
-            url: "https://kind.sigs.k8s.io/dl/{{ kind_release }}/kind-{{ _family }}-{{ _arch }}"
+            url: "https://kind.sigs.k8s.io/dl/{{ _kind_release_tag }}/kind-{{ kind_release_family }}-{{ kind_release_architecture }}"
             dest: "{{ _kind_bin }}"
-            mode: 0777
-          vars:
-            _family: "{{ ansible_system | lower }}"
-            _arch: "{{ (ansible_architecture == 'x86_64') | ternary('amd64', ansible_architecture) }}"
+            mode: "u=rwx,og=rx"
           changed_when: false
 
     - name: List Kind clusters
@@ -72,6 +58,7 @@
       ansible.builtin.shell: >-
         KUBECONFIG={{ kind_kubeconfig }} kubectl get nodes --no-headers
       register: kind_node_query
+      changed_when: false
 
     - name: Verify Kubectl node query execution
       ansible.builtin.assert:
