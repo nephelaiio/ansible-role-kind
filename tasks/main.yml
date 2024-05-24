@@ -69,12 +69,6 @@
             _supernet: "{{ kind_network_addr }}"
             _subnet: "{{ _supernet | ansible.utils.ipsubnet(24, 0) }}"
 
-        - name: Query private registry container info
-          community.docker.docker_container_info:
-            name: "{{ kind_registry_container }}"
-          register: kind_registry_query
-          changed_when: false
-
         - name: Deploy docker private registry
           community.docker.docker_container:
             auto_remove: true
@@ -85,15 +79,7 @@
                 aliases:
                   - "{{ kind_registry_hostname }}"
             published_ports: "{{ kind_registry_port }}:5000"
-          when:
-            - kind_registry_deploy | bool
-            - not kind_registry_query.exists
-          changed_when: false
-
-        - name: Query proxy container info
-          community.docker.docker_container_info:
-            name: "{{ kind_proxy_container }}"
-          register: kind_proxy_query
+          when: kind_registry_deploy | bool
           changed_when: false
 
         - name: Deploy docker registry proxy
@@ -105,9 +91,7 @@
               - name: "{{ kind_network_name }}"
                 aliases:
                   - "{{ kind_proxy_hostname }}"
-          when:
-            - kind_proxy_deploy | bool
-            - not kind_proxy_query.exists
+          when: kind_proxy_deploy | bool
           changed_when: false
 
     - name: Destroy Kind proxies
