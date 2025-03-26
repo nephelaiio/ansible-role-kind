@@ -21,12 +21,12 @@ jobs:
       - name: Check out the codebase
         uses: actions/checkout@v4
         with:
-          path: "nephelaiio.k8s"
+          path: "nephelaiio.kind"
 
       - name: Install devbox
         uses: jetify-com/devbox-install-action@v0.12.0
         with:
-          project-path: "nephelaiio.k8s"
+          project-path: "nephelaiio.kind"
 
       - name: Lint code
         run: devbox run -- make lint

@@ -34,15 +34,15 @@ jobs:
       - name: Install devbox
         uses: jetify-com/devbox-install-action@v0.12.0
         with:
-          project-path: "nephelaiio.k8s"
+          project-path: "nephelaiio.kind"
 
       - name: Install dependencies
         run: devbox run -- make install
-        working-directory: "nephelaiio.k8s"
+        working-directory: "nephelaiio.kind"
 
       - name: Run molecule tests
         run: devbox run -- make test
-        working-directory: "nephelaiio.k8s"
+        working-directory: "nephelaiio.kind"
         env:
           K8S_RELEASE: ${{ matrix.k8s }}
           GH_TOKEN: ${{ secrets.GH_TOKEN }}
