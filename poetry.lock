@@ -837,22 +837,6 @@ files = [
 ]
 
 [[package]]
-name = "netaddr"
-version = "1.3.0"
-description = "A network address manipulation library for Python"
-optional = false
-python-versions = ">=3.7"
-groups = ["dev"]
-markers = "sys_platform == \"linux2\" or sys_platform == \"linux\" or sys_platform != \"linux2\" and sys_platform != \"linux\""
-files = [
-    {file = "netaddr-1.3.0-py3-none-any.whl", hash = "sha256:c2c6a8ebe5554ce33b7d5b3a306b71bbb373e000bbbf2350dd5213cc56e3dbbe"},
-    {file = "netaddr-1.3.0.tar.gz", hash = "sha256:5c3c3d9895b551b763779ba7db7a03487dc1f8e3b385af819af341ae9ef6e48a"},
-]
-
-[package.extras]
-nicer-shell = ["ipython"]
-
-[[package]]
 name = "packaging"
 version = "24.2"
 description = "Core utilities for Python packages"
@@ -1440,4 +1424,4 @@ type = ["pytest-mypy"]
 [metadata]
 lock-version = "2.1"
 python-versions = "^3.11"
-content-hash = "aa2d2cb492da78410c7d8a0de19861c1ad3a5b0afe2e095497f471e9320ab1e7"
+content-hash = "b964e572d9bc5afde84d572871941274d885f2627647cf948e3e2e767a317019"
