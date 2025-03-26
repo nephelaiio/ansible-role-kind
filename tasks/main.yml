@@ -41,7 +41,10 @@
             _kind_release_tag: "{{ (kind_release_tag in ['latest', '']) | ternary(_latest, kind_release_tag) }}"
           vars:
             _uri: "https://api.github.com/repos/kubernetes-sigs/kind/releases/latest"
-            _query: "{{ lookup('ansible.builtin.url', _uri, split_lines=False) | from_json }}"
+            _gh_token: "{{ lookup('ansible.builtin.env', 'GH_TOKEN') }}"
+            _github_token: "{{ lookup('ansible.builtin.env', 'GITHUB_TOKEN', default=_gh_token) }}"
+            _headers: "{{ {} if not _github_token else { 'Authorization': 'token ' + _github_token } }}"
+            _query: "{{ lookup('ansible.builtin.url', _uri, split_lines=False, headers=_headers) | from_json }}"
             _latest: "{{ _query.tag_name }}"
 
         - name: Debug Kind release and tag
