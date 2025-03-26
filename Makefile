@@ -12,12 +12,12 @@ test: install
 	poetry run molecule $@ -s ${MOLECULE_SCENARIO}
 
 install:
-	@type poetry >/dev/null || pip3 install poetry
-	@type yq || sudo apt-get install -y yq
 	@poetry install --no-root
 
 lint: install
-	poetry run yamllint . && poetry run ansible-lint .
+	poetry run yamllint .
+	poetry run ansible-lint .
+	poetry run molecule syntax
 
 dependency create prepare converge idempotence side-effect verify destroy cleanup reset list:
 	KIND_RELEASE=$(KIND_RELEASE) \
@@ -48,3 +48,10 @@ endif
 
 kubectl:
 	@KUBECONFIG=$(MOLECULE_EPHEMERAL_DIR)/config $@ ${KUBECTL_ARGS}
+
+publish:
+	@echo publishing repository ${GITHUB_REPOSITORY}
+	@echo GITHUB_ORGANIZATION=${GITHUB_ORG}
+	@echo GITHUB_REPOSITORY=${GITHUB_REPO}
+	@poetry run ansible-galaxy role import \
+		--api-key ${GALAXY_API_KEY} ${GITHUB_ORG} ${GITHUB_REPO}

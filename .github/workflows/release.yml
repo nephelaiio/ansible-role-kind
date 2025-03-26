@@ -1,11 +1,9 @@
 ---
-# This workflow requires a GALAXY_API_KEY secret present in the GitHub
-# repository or organization.
-#
-# See: https://github.com/marketplace/actions/publish-ansible-role-to-galaxy
-# See: https://github.com/ansible/galaxy/issues/46
-
 name: release
+
+env:
+  DEVBOX_VERSION: ${{ vars.DEVBOX_VERSION }}
+
 on:
   push:
     tags:
@@ -13,29 +11,24 @@ on:
 
 defaults:
   run:
-    working-directory: 'nephelaiio.kind'
+    working-directory: "nephelaiio.kind"
 
 jobs:
   release:
     name: release
     runs-on: ubuntu-latest
     steps:
-      - name: Check out the codebase
+      - name: Check out the codebase.
         uses: actions/checkout@v4
         with:
-          path: 'nephelaiio.kind'
+          path: "nephelaiio.kind"
 
-      - name: Set up Python 3
-        uses: actions/setup-python@v5
+      - name: Install devbox
+        uses: jetify-com/devbox-install-action@v0.12.0
         with:
-          python-version: '3.11'
+          project-path: "nephelaiio.kind"
 
-      - name: Install poetry
-        run: pip3 install poetry
-
-      - name: Install pips
-        run: poetry install
-
-      - name: Trigger a new import on galaxy
-        run: >-
-          poetry run ansible-galaxy role import --api-key ${{ secrets.GALAXY_API_KEY }} $(echo $GITHUB_REPOSITORY | cut -d/ -f1) $(echo $GITHUB_REPOSITORY | cut -d/ -f2)
+      - name: Release collection
+        run: devbox run -- make publish
+        env:
+          GALAXY_API_KEY: "${{ secrets.GALAXY_API_KEY }}"

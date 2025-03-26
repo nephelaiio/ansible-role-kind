@@ -1,8 +1,15 @@
-*.swp
+# directories
+.devbox/
+.venv/
 .molecule/
 .cache/
 __pycache__/
-Gemfile.lock
+
+# globs
+*.swp
 **/.ropeproject
+
+# files
+Gemfile.lock
 playbook.retry
 .python-version
