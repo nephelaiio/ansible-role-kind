@@ -1,6 +1,6 @@
 # nephelaiio.kind
 
-[![Build Status](https://github.com/nephelaiio/ansible-role-kind/workflows/Molecule/badge.svg)](https://github.com/nephelaiio/ansible-role-kind/actions)
+[![Build Status](https://github.com/nephelaiio/ansible-role-kind/workflows/molecule/badge.svg)](https://github.com/nephelaiio/ansible-role-kind/actions/workflows/molecule.yml)
 [![Ansible Galaxy](http://img.shields.io/badge/ansible--galaxy-nephelaiio.kind-blue.svg)](https://galaxy.ansible.com/nephelaiio/kind/)
 
 An [ansible role](https://galaxy.ansible.com/nephelaiio/kind) to install and destroy [Kind](https://github.com/kubernetes-sigs/kind) clusters
@@ -10,7 +10,7 @@ An [ansible role](https://galaxy.ansible.com/nephelaiio/kind) to install and des
 With default values role will instanciate a 4 node cluster using latest kind release and image. The following is the list of user serviceable variables
 
 | Parameter              |        Default | Type    | Required  | Description                                                                        |
-|:-----------------------|---------------:|:--------|:----------|------------------------------------------------------------------------------------|
+| :--------------------- | -------------: | :------ | :-------- | ---------------------------------------------------------------------------------- |
 | kind_release_tag       |         latest | string  | false     | Taken from Kind's [release page](https://github.com/kubernetes-sigs/kind/releases) |
 | kind_image_tag         |         latest | string  | false     | Taken from [docker hub](https://hub.docker.com/r/kindest/node/tags)                |
 | kind_cluster_state     |        present | string  | false     | Whether to create ('present') or destroy ('absent') the target cluster             |
@@ -26,13 +26,15 @@ With default values role will instanciate a 4 node cluster using latest kind rel
 | kind_proxy_hostname    |      localhost | string  | false     | Hostname for proxy registry                                                        |
 | kind_proxy_cleanup     |           true | string  | false     | Add proxy registry container to cluster configuration                              |
 | kind_nodes             |              4 | integer | false     | Cluster size                                                                       |
+
 ## Dependencies
 
 ### System
 
 The below requirements are needed on the host that executes this module.
-* Linux or Darwin 64 bit OS
-* kubectl binary is available on path
+
+- Linux or Darwin 64 bit OS
+- kubectl binary is available on path
 
 This role is compatible with arm64 and darwin distributions. You must gather facts before running this role for this to work as intended.
 
@@ -41,11 +43,12 @@ For this role to run on apple silicon devices you **must** export the environmen
 ### Ansible
 
 The below python collections are needed on the host that executes this module:
-* ansible.utils
+
+- ansible.utils
 
 ## Example Playbook
 
-``` yaml
+```yaml
 ---
 - name: converge
   hosts: all
@@ -57,8 +60,8 @@ The below python collections are needed on the host that executes this module:
 
 Please make sure your environment has [docker](https://www.docker.com) installed; then test the role from the project root using the following commands
 
-* ` poetry instasll`
-* ` poetry run molecule test `
+- ` poetry instasll`
+- `poetry run molecule test`
 
 ## License
 

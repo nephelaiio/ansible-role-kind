@@ -5,12 +5,10 @@ on:
   pull_request:
     branches:
       - master
-  schedule:
-    - cron: "0 5 * * 5"
 
 defaults:
   run:
-    working-directory: 'nephelaiio.kind'
+    working-directory: "nephelaiio.kind"
 
 jobs:
   molecule:
@@ -22,76 +20,30 @@ jobs:
           - default
           - singlenode
           - registry
-        include:
-          - release: v0.22.0
-            image: v1.29.2
-          - release: v0.22.0
-            image: v1.28.7
-          - release: v0.22.0
-            image: v1.27.11
-          - release: v0.22.0
-            image: v1.26.14
-          - release: v0.22.0
-            image: v1.25.16
-          - release: v0.21.0
-            image: v1.29.1
-          - release: v0.21.0
-            image: v1.28.6
-          - release: v0.21.0
-            image: v1.27.10
-          - release: v0.21.0
-            image: v1.26.13
-          - release: v0.21.0
-            image: v1.25.16
-          - release: v0.20.0
-            image: v1.27.3
-          - release: v0.20.0
-            image: v1.26.6
-          - release: v0.20.0
-            image: v1.25.11
-          - release: v0.17.0
-            image: v1.25.2
-          - release: v0.16.0
-            image: v1.25.2
-          - release: v0.16.0
-            image: v1.24.6
-          - release: v0.16.0
-            image: v1.23.12
-          - release: v0.15.0
-            image: v1.24.4
-          - release: v0.15.0
-            image: v1.23.10
+        k8s:
+          - v1.32.2
+          - v1.31.6
+          - v1.30.10
+          - v1.29.14
     steps:
       - name: Check out the codebase
         uses: actions/checkout@v4
         with:
-          path: 'nephelaiio.kind'
+          path: "nephelaiio.kind"
 
-      - name: Set up python 3
-        uses: actions/setup-python@v5
+      - name: Install devbox
+        uses: jetify-com/devbox-install-action@v0.12.0
         with:
-          python-version: '3.11'
+          project-path: "nephelaiio.kind"
 
-      - name: Install poetry
-        run: pip3 install poetry
-
-      - name: Install Kind
-        uses: engineerd/setup-kind@v0.5.0
-        with:
-          version: "v0.22.0"
-          skipClusterCreation: true
-
-      - name: Update ubuntu repositories
-        run: sudo apt-get update
-
-      - name: Install make
-        run: sudo apt-get install -y make
+      - name: Install dependencies
+        run: devbox run -- make install
+        working-directory: "nephelaiio.kind"
 
       - name: Run molecule tests
-        run: make test
+        run: devbox run -- make test
+        working-directory: "nephelaiio.kind"
         env:
-          PY_COLORS: '1'
-          ANSIBLE_FORCE_COLOR: '1'
-          KIND_RELEASE: ${{ matrix.release }}
-          KIND_IMAGE: ${{ matrix.image }}
+          K8S_RELEASE: ${{ matrix.k8s }}
+          GH_TOKEN: ${{ secrets.GH_TOKEN }}
           MOLECULE_SCENARIO: ${{ matrix.scenario }}
