@@ -1,6 +1,7 @@
 # directories
 .devbox/
 .venv/
+.ansible/
 .molecule/
 .cache/
 __pycache__/
