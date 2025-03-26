@@ -1,7 +1,7 @@
 ---
 - name: Destroy
   hosts: localhost
-  gather_facts: true
+  connection: local
   vars:
     kind_cluster_state: absent
     kind_registry_container: "{{ kind_cluster_name }}-registry"

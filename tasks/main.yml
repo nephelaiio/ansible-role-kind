@@ -100,13 +100,13 @@
         - name: Destroy docker private registry
           community.docker.docker_container:
             state: absent
-            name: '{{ kind_registry_container }}'
+            name: "{{ kind_registry_container }}"
           when: kind_registry_cleanup | bool
 
         - name: Destroy docker registry proxy
           community.docker.docker_container:
             state: absent
-            name: '{{ kind_proxy_container }}'
+            name: "{{ kind_proxy_container }}"
           when: kind_proxy_cleanup | bool
 
     - name: List Kind clusters

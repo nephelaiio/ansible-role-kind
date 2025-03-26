@@ -9,6 +9,6 @@
   ],
   "shell": {
     "init_hook": [],
-    "scripts":   {}
+    "scripts": {}
   }
 }

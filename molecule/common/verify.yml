@@ -1,7 +1,7 @@
 ---
 - name: Verify Kind cluster deployment
   hosts: localhost
-  gather_facts: true
+  connection: local
   vars:
     kind_release_family: "{{ (ansible_system | default('linux') | lower) }}"
     kind_architecture: "{{ ansible_architecture | default('x86_64') }}"

@@ -1,7 +1,7 @@
 .PHONY: ${MAKECMDGOALS}
 
-KIND_RELEASE := $$(yq eval '.jobs.molecule.strategy.matrix.include[0].release ' .github/workflows/molecule.yml)
-KIND_IMAGE := $$(yq eval '.jobs.molecule.strategy.matrix.include[0].image' .github/workflows/molecule.yml)
+KIND_RELEASE := latest
+KIND_IMAGE := $$(yq eval '.jobs.molecule.strategy.matrix.k8s[0]' .github/workflows/molecule.yml)
 ROLE_NAME := $$(pwd | xargs basename)
 MOLECULE_SCENARIO ?= default
 MOLECULE_EPHEMERAL_DIR := "$$HOME/.cache/molecule/$(ROLE_NAME)/$(SCENARIO)"
