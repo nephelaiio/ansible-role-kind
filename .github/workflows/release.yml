@@ -28,7 +28,7 @@ jobs:
         with:
           project-path: "nephelaiio.kind"
 
-      - name: Release collection
+      - name: Release role
         run: devbox run -- make publish
         env:
           GALAXY_API_KEY: "${{ secrets.GALAXY_API_KEY }}"
