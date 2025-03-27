@@ -5,6 +5,8 @@ KIND_IMAGE := $$(yq eval '.jobs.molecule.strategy.matrix.k8s[0]' .github/workflo
 ROLE_NAME := $$(pwd | xargs basename)
 MOLECULE_SCENARIO ?= default
 MOLECULE_EPHEMERAL_DIR := "$$HOME/.cache/molecule/$(ROLE_NAME)/$(SCENARIO)"
+GITHUB_ORG = $$(echo ${GITHUB_REPOSITORY} | cut -d/ -f 1)
+GITHUB_REPO = $$(echo ${GITHUB_REPOSITORY} | cut -d/ -f 2)
 
 test: install
 	KIND_RELEASE=$(KIND_RELEASE) \
